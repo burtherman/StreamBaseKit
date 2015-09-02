@@ -14,19 +14,15 @@ func paths(paths: (Int, Int)...) -> [NSIndexPath] {
 }
 
 class TestItem : StreamBaseItem {
-    static let a = TestItem(Fakebase.sharedBase.childByAppendingPath("a"))
-    static let b = TestItem(Fakebase.sharedBase.childByAppendingPath("b"))
-    static let c = TestItem(Fakebase.sharedBase.childByAppendingPath("c"))
-    static let d = TestItem(Fakebase.sharedBase.childByAppendingPath("d"))
+    static let a = TestItem(key: "a")
+    static let b = TestItem(key: "b")
+    static let c = TestItem(key: "c")
+    static let d = TestItem(key: "d")
     
     var bool: Bool?
     var int: Int?
     var float: Float?
     var string: String?
-    
-    convenience init(_ ref: Firebase) {
-        self.init(ref: ref, dict: nil)
-    }
     
     override var dict: [String: AnyObject] {
         var d = super.dict
@@ -71,7 +67,7 @@ class TestDelegate : StreamBaseDelegate {
     func streamItemsChanged(paths: [NSIndexPath]) {
         itemChanged.extend(paths)
     }
-    func streamDidFinishInitialLoad() {
+    func streamDidFinishInitialLoad(error: NSError?) {
     }
 }
 
@@ -99,20 +95,14 @@ class FakeSnapshot : FDataSnapshot {
     override var value: AnyObject {
         return v
     }
-    
-    override var ref: Firebase! {
-        return Fakebase.sharedBase.childByAppendingPath(k)
-    }
-    
-    init(key: String, value: [String: AnyObject]) {
+        
+    init(key: String, value: [String: AnyObject] = [:]) {
         self.k = key
         self.v = value
     }
 }
 
 class Fakebase : Firebase {
-    static let sharedBase = Fakebase(fakeKey: nil)
-    
     typealias Handler = ((FDataSnapshot!) -> Void)
     var handlers = [FEventType: Handler]()
     var fakeKey: String?

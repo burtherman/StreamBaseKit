@@ -5,29 +5,50 @@
 //  Created by Steve Farrell on 8/31/15.
 //  Copyright (c) 2015 Movem3nt, Inc. All rights reserved.
 //
-//  A Collection that wraps both an array and dictionary.  It has O(1) access 
-//  by index or key and for appends, but is O(n) for inserts and deletes.
 
 import Foundation
 
+/**
+    An object with an identifiying key, such as those found in the hierarchical 
+    Firebase data model.
+*/
 public protocol KeyedObject: class {
     var key: String? { get }
 }
 
+/**
+    A Collection that wraps both an array and dictionary.  It has O(1) access
+    by index or key and for appends, but is O(n) for inserts and deletes.  The
+    objects it contains are expected to have unique keys.
+*/
 public class KeyedArray<T: KeyedObject> {
-    var rawArray = [T]()
+    private(set) var rawArray = [T]()
     private var index = [String: Int]()
     
-    public convenience init(ts: T...) {
-        self.init(rawArray: ts)
+    /**
+        Construct an instance initialized to contain specific objects.
+        
+        :param: objects The objects to initialize the array from.
+    */
+    public convenience init(objects: T...) {
+        self.init(rawArray: objects)
     }
-    
+
+    /**
+        Construct an instance initialized to the contents of an array.
+
+        :param: rawArray    The raw array to initialize from.
+    */
     public init(rawArray: [T]) {
-        for t in rawArray {
-            append(t)
-        }
+        extend(rawArray)
     }
     
+    /**
+        Get the index of a given key.
+        
+        :param: key The key to check for.
+        :returns:    The index, or nil if the key is not present.
+    */
     public func find(key: String) -> Int? {
         if let i = index[key] {
             return i
@@ -35,82 +56,59 @@ public class KeyedArray<T: KeyedObject> {
         return nil
     }
     
+    /**
+        Check to see if array has a given key.
+    
+        :param: key The key to check for.
+        :returns:    Whether the key is present.
+    */
     public func has(key: String) -> Bool {
         return find(key) != nil
     }
 
-    // TODO: should use existing ordering, no need to pass in predicate
-    public func findFirstWhere(predicate: T -> Bool) -> Int? {
-        if rawArray.isEmpty {
-            return nil
-        }
-        
-        var left = rawArray.startIndex
-        var right = rawArray.endIndex - 1
-        
-        if predicate(rawArray.first!) {
-            return left
-        }
-        
-        var midpoint = rawArray.count / 2
-        while right - left > 1 {
-            if predicate(rawArray[midpoint]) {
-                right = midpoint
-            } else {
-                left = midpoint
-            }
-            midpoint = (left + right) / 2
-        }
-        return predicate(rawArray[left]) ? left : (predicate(rawArray[right]) ? right : nil)
-    }
+    /**
+        Append one or more objects to the array.
     
-    // TODO: should use existing ordering, no need to pass in predicate
-    public func findLastWhere(predicate: T -> Bool) -> Int? {
-        if rawArray.isEmpty {
-            return nil
+        :param: objects The object or objects to add to the array.
+    */
+    public func append(objects: T...) {
+        for o in objects {
+            precondition(index[o.key!] == nil, "Cannot append item with existing key: \(o.key!)")
+            index[o.key!] = rawArray.count
+            rawArray.append(o)
         }
-        
-        var left = rawArray.startIndex
-        var right = rawArray.endIndex - 1
-        
-        if predicate(rawArray.last!) {
-            return right
-        }
-        
-        var midpoint = rawArray.count / 2
-        while right - left > 1 {
-            if predicate(rawArray[midpoint]) {
-                left = midpoint
-            } else {
-                right = midpoint
-            }
-            midpoint = (left + right) / 2
-        }
-        return predicate(rawArray[right]) ? right : (predicate(rawArray[left]) ? left : nil)
     }
-    
-    public func append(t: T) {
-        precondition(index[t.key!] == nil, "Cannot append item with existing key: \(t.key!)")
-        index[t.key!] = rawArray.count
-        rawArray.append(t)
-    }
-    
-    public func extend(ts: [T]) {
-        for t in ts {
-            append(t)
+
+    /**
+        Concatenate objects onto the array.
+
+        :param: objects The array of objects to concatenate or extend with.
+    */
+    public func extend(objects: [T]) {
+        for o in objects {
+            append(o)
         }
     }
     
-    // NOTE: O(n)
-    public func insert(t: T, atIndex: Int) {
-        precondition(index[t.key!] == nil, "Cannot insert item with existing key: \(t.key!)")
-        rawArray.insert(t, atIndex: atIndex)
+    /**
+        Insert an object into the array at a given index.  NOTE: O(n)
+
+        :param: object  The object to insert.
+        :param: atIndex The index at which to insert the object.
+    */
+    public func insert(object: T, atIndex: Int) {
+        precondition(index[object.key!] == nil, "Cannot insert item with existing key: \(object.key!)")
+        rawArray.insert(object, atIndex: atIndex)
         for i in atIndex..<rawArray.count {
             index[rawArray[i].key!] = i
         }
     }
     
-    // NOTE: O(n)
+    /**
+        Remove an object from the array at a given index.  NOTE: O(n)
+        
+        :param: atIndex The index at which to insert the object.
+    */
     public func removeAtIndex(atIndex: Int) {
         let t = rawArray.removeAtIndex(atIndex)
         index.removeValueForKey(t.key!)
@@ -119,20 +117,32 @@ public class KeyedArray<T: KeyedObject> {
         }
     }
     
+    /**
+        Reset to initial state.
+    */
     public func clear() {
         rawArray = []
         index = [:]
     }
     
-    public func reset(keyedArray: KeyedArray<T>) {
-        reset(keyedArray.rawArray)
+    /**
+        Update array so its state matches other array.
+
+        :param: other   The other array.
+    */
+    public func reset(other: KeyedArray<T>) {
+        rawArray = other.rawArray
+        index = other.index
     }
     
+    /**
+        Update array so its state matches a raw array.
+        
+        :param: rawArray   The raw array.
+    */
     public func reset(rawArray: [T]) {
         clear()
-        for t in rawArray {
-            append(t)
-        }
+        extend(rawArray)
     }
 }
 

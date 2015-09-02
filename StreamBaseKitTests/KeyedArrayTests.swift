@@ -50,28 +50,4 @@ class KeyedArrayTests: XCTestCase {
         XCTAssertEqual(0, testArray.find(TestKeyedObject.b.key!)!)
         XCTAssertEqual(1, testArray.find(TestKeyedObject.c.key!)!)
     }
-    
-    func testKeyedArrayFindWhere() {
-        for i in 0..<100 {
-            testArray.append(TestKeyedObject("\(i)0"))
-        }
-        
-        XCTAssertNil(testArray.findFirstWhere({ $0.key?.toInt() < 0 }))
-        XCTAssertEqual(0, testArray.findFirstWhere({ $0.key?.toInt() < 1 })!)
-        XCTAssertEqual(0, testArray.findFirstWhere({ $0.key?.toInt() < 10000 })!)
-        XCTAssertEqual(1, testArray.findFirstWhere({ $0.key?.toInt() > 1 })!)
-        XCTAssertEqual(51, testArray.findFirstWhere({ $0.key?.toInt() > 505 })!)
-        XCTAssertEqual(0, testArray.findFirstWhere({ $0.key?.toInt() < 505 })!)
-        
-        XCTAssertNil(testArray.findLastWhere({ $0.key?.toInt() < 0 }))
-        XCTAssertEqual(0, testArray.findLastWhere({ $0.key?.toInt() < 1 })!)
-        XCTAssertEqual(99, testArray.findLastWhere({ $0.key?.toInt() < 10000 })!)
-        XCTAssertEqual(99, testArray.findLastWhere({ $0.key?.toInt() > 1 })!)
-        XCTAssertEqual(99, testArray.findLastWhere({ $0.key?.toInt() > 505 })!)
-        XCTAssertEqual(50, testArray.findLastWhere({ $0.key?.toInt() < 505 })!)
-        
-        let emptyArray = KeyedArray<TestKeyedObject>()
-        XCTAssertNil(emptyArray.findFirstWhere({ t in true }))
-        XCTAssertNil(emptyArray.findLastWhere({ t in true }))
-    }
 }

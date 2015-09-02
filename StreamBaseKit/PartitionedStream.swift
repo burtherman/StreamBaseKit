@@ -10,25 +10,43 @@
 
 import Foundation
 
+/**
+    Split a stream into multiple sections using a partition function.  Note that
+    this partition function runs client-side and so care must be taken for
+    scalability.  Alternatively, one can use multiple StreamBase's assigned to
+    different sections (details in StreamTableViewAdapter).
+*/
 public class PartitionedStream {
     public typealias Partitioner = StreamBaseItem -> Int
     
     public weak var delegate: StreamBaseDelegate?
     
+    /**
+        The number of sections in this partitioned stream.
+    */
     public let numSections : Int
+    
+    /**
+        The titles for those sections.
+    */
     public let sectionTitles : [String]
     
     private let stream : StreamBase
     private var sections = [[StreamBaseItem]]()
     private let partitioner : Partitioner
-    private var map = [NSIndexPath]()
     
-    public var mapForTesting: [NSIndexPath] {
-        get {
-            return map
-        }
-    }
-    
+    /**
+        This is exposed for testing purposes only!
+    */
+    public private(set) var map = [NSIndexPath]()
+        
+    /**
+        Construct a partitioned stream from a regular stream.
+
+        :param: stream  The underlying stream.
+        :param: sectionTitles   The titles to assign to the sections.
+        :param: partitioner A function that takes an item and returns the section it belongs in.
+    */
     public init(stream: StreamBase, sectionTitles: [String], partitioner: Partitioner) {
         self.stream = stream
         self.sectionTitles = sectionTitles
@@ -40,14 +58,27 @@ public class PartitionedStream {
         }
     }
     
+    /**
+        Index the partitioned stream directly by index path.
+        :param: index   The index.
+    */
     public subscript(index: NSIndexPath) -> StreamBaseItem {
         return sections[index.section][index.row]
     }
 
+    /**
+        Index the partitioned stream by the section and row.
+        :param: section The section.
+        :param: row The row.
+    */
     public subscript(section: Int, row: Int) -> StreamBaseItem {
         return sections[section][row]
     }
     
+    /**
+        Retrieve the underlying array of items in a given section.
+        :param: section The section.
+    */
     public subscript(section: Int) -> [StreamBaseItem] {
         return sections[section]
     }
@@ -188,7 +219,7 @@ extension PartitionedStream : StreamBaseDelegate {
         }
     }
     
-    public func streamDidFinishInitialLoad() {
-        delegate?.streamDidFinishInitialLoad()
+    public func streamDidFinishInitialLoad(error: NSError?) {
+        delegate?.streamDidFinishInitialLoad(error)
     }
 }

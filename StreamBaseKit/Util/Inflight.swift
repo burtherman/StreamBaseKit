@@ -5,18 +5,36 @@
 //  Created by Steve Farrell on 4/30/15.
 //  Copyright (c) 2015 Movem3nt, Inc. All rights reserved.
 //
-//  RAII interface for network activity indicator: simply keep an Inflight object
-//  in scope for the duration of the request.  As long as you're not leaking Inflight
-//  objects, the underlying counter will remain accurate.  There are a few ways to make
-//  sure this works with closures.  I recommend this pattern:
-//
-//  var inflight : Inflight? = Inflight()
-//  doSomethingInBackground() { 
-//    inflight = nil
-//  }
 
 import UIKit
 
+/**
+    RAII interface for network activity indicator: simply keep an Inflight object
+    in scope for the duration of the request.  As long as you're not leaking Inflight
+    objects, the underlying counter will remain accurate.  There are a few ways to make
+    sure this works with closures.  Example usage:
+
+```
+var inflight : Inflight? = Inflight()
+doSomethingInBackground() {
+  inflight = nil
+}
+```
+*/
+public class Inflight {
+    
+    /**
+        Indicates that some work is happening and network activity indicator should
+        appear.
+    */
+    public init() {
+        InflightManager.sharedManager.increment()
+    }
+    
+    deinit {
+        InflightManager.sharedManager.decrement()
+    }
+}
 
 private class InflightManager {
     private static let sharedManager = InflightManager()
@@ -42,16 +60,5 @@ private class InflightManager {
         if newValue == 0 {
             UIApplication.sharedApplication().networkActivityIndicatorVisible = false
         }
-    }
-}
-
-class Inflight {
-
-    init() {
-        InflightManager.sharedManager.increment()
-    }
-    
-    deinit {
-        InflightManager.sharedManager.decrement()
     }
 }

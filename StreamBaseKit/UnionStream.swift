@@ -8,21 +8,36 @@
 
 import Foundation
 
+/**
+    Compose a stream out of other streams.  Some example use cases are:
+
+    * Placeholders for displaying a "fetch more" control, and "new since last visit".
+    * Mixing two queries - eg for high priority content and recent content - into same view.
+
+    It's ok for the keys to overlap, and for different substreams to have different
+    types.  The sort order of the first stream is used by the union stream.  (The sort orders 
+    of the other streams is ignored.)
+*/
 public class UnionStream {
     private let sources: [StreamBase]  // TODO switch to StreamBaseProtocol
     private let delegates: [UnionStreamDelegate]
     private var timer: NSTimer?
     private var numStreamsFinished: Int? = 0
     private var union = KeyedArray<StreamBaseItem>()
+    private var error: NSError?
     weak public var delegate: StreamBaseDelegate?
     
-    var comparator: StreamBase.Comparator {
+    private var comparator: StreamBase.Comparator {
         get {
             return sources[0].comparator
         }
     }
-    
-    // The sort order of the first source is used.
+
+    /**
+        Construct a union stream from other streams.  The sort order of the first substream
+        is used for the union.
+        :param: sources The substreams.
+    */
     public init(sources: [StreamBase]) {
         precondition(sources.count > 0)
         self.sources = sources
@@ -50,7 +65,7 @@ public class UnionStream {
         
         if numStreamsFinished == sources.count {
             numStreamsFinished = nil
-            delegate?.streamDidFinishInitialLoad()
+            delegate?.streamDidFinishInitialLoad(error)
         }
     }
     
@@ -61,7 +76,8 @@ public class UnionStream {
         }
     }
     
-    func didFinishInitialLoad() {
+    func didFinishInitialLoad(error: NSError?) {
+        self.error = error
         numStreamsFinished?++
         needsUpdate()
     }
@@ -133,7 +149,7 @@ private class UnionStreamDelegate: StreamBaseDelegate {
         }
     }
     
-    func streamDidFinishInitialLoad() {
-        union?.didFinishInitialLoad()
+    func streamDidFinishInitialLoad(error: NSError?) {
+        union?.didFinishInitialLoad(error)
     }
 }

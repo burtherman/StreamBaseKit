@@ -14,13 +14,13 @@ class StreamBaseTests: XCTestCase {
     var ref: Fakebase!
     var stream: StreamBase!
     var delegate: TestDelegate!
-    let snapA = FakeSnapshot(key: TestItem.a.key!, value: [:])
-    let snapB = FakeSnapshot(key: TestItem.b.key!, value: [:])
-    let snapC = FakeSnapshot(key: TestItem.c.key!, value: [:])
+    let snapA = FakeSnapshot(key: TestItem.a.key!)
+    let snapB = FakeSnapshot(key: TestItem.b.key!)
+    let snapC = FakeSnapshot(key: TestItem.c.key!)
     
     override func setUp() {
         super.setUp()
-        ref = Fakebase.sharedBase
+        ref = Fakebase()
         stream = StreamBase(type: TestItem.self, ref: ref)
         stream.batchDelay = nil
         delegate = TestDelegate()
@@ -156,4 +156,39 @@ class StreamBaseTests: XCTestCase {
             XCTAssertFalse(rev.comparator(a, b), "\(a.key!) < \(b.key!)")
         }
     }
+    
+    func testFindFirstLastWithEmptyArray() {
+        XCTAssertEqual(0, stream.count)
+        XCTAssertNil(stream.findLastIndexPathBefore(TestItem(key: "-")))
+        XCTAssertNil(stream.findFirstIndexPathAfter(TestItem(key: "-")))
+    }
+    
+    func testFindFirstWithFullArray() {
+        for i in 0..<100 {
+            ref.add(FakeSnapshot(key: String(format: "%02d", i)))
+        }
+        XCTAssertEqual(100, stream.count)
+        
+        XCTAssertEqual(0, stream.findFirstIndexPathAfter(TestItem(key: "-"))!.row)
+        XCTAssertEqual(0, stream.findFirstIndexPathAfter(TestItem(key: "0-"))!.row)
+        XCTAssertEqual(2, stream.findFirstIndexPathAfter(TestItem(key: "01-"))!.row)
+        XCTAssertEqual(11, stream.findFirstIndexPathAfter(TestItem(key: "10-"))!.row)
+        XCTAssertEqual(21, stream.findFirstIndexPathAfter(TestItem(key: "20-"))!.row)
+        XCTAssertNil(stream.findFirstIndexPathAfter(TestItem(key: "~")))
+    }
+    
+    func testFindLastWithFullArray() {
+        for i in 0..<100 {
+            ref.add(FakeSnapshot(key: String(format: "%02d", i)))
+        }
+        XCTAssertEqual(100, stream.count)
+        
+        XCTAssertNil(stream.findLastIndexPathBefore(TestItem(key: "-")))
+        XCTAssertNil(stream.findLastIndexPathBefore(TestItem(key: "0-")))
+        XCTAssertEqual(1, stream.findLastIndexPathBefore(TestItem(key: "01-"))!.row)
+        XCTAssertEqual(10, stream.findLastIndexPathBefore(TestItem(key: "10-"))!.row)
+        XCTAssertEqual(20, stream.findLastIndexPathBefore(TestItem(key: "20-"))!.row)
+        XCTAssertEqual(99, stream.findLastIndexPathBefore(TestItem(key: "~"))!.row)
+    }
+
 }

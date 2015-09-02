@@ -8,15 +8,57 @@
 
 import Firebase
 
+/**
+    Delegate invoked with StreamBase changes.  The semantics of this are intended
+    to align with UITableView and UICollectionView.  For example, deleted paths are 
+    expected to be processed first, and so their indices are based on the array before 
+    any changes have been made.  Additionally, adds and deletes are batched and wrapped 
+    in will/did change methods.
+*/
 public protocol StreamBaseDelegate: class {
+    /**
+        A batch of changes is beginning.
+    */
     func streamWillChange()
+    
+    /**
+        A batch of changes has ended.
+    */
     func streamDidChange()
+
+    /**
+        Several items have been added.  These paths indicate where these items will appear
+        after the update.
+    */
     func streamItemsAdded(paths: [NSIndexPath])
+    
+    /**
+        Several items have been deleted.  These paths indicate where in the original table
+        or collection them items were.
+    */
     func streamItemsDeleted(paths: [NSIndexPath])
+    
+    /**
+        Several items have changed.
+    */
     func streamItemsChanged(paths: [NSIndexPath])
-    func streamDidFinishInitialLoad()
+    
+    /**
+        The initial fetch has completed.  Only called once.
+    
+        :param: error   Error, if any.
+    */
+    func streamDidFinishInitialLoad(error: NSError?)
 }
 
+/**
+    Common interface among several stream-like things including StreamBase, UnionStream 
+    and PartitionedStream.
+
+    This protocol is under-used because what I think are Swift 1.2 limitations.  For
+    example, if this protocol extends SequenceType (as it should), then it can not be
+    used as the type of an instance variable.
+*/
 public protocol StreamBaseProtocol: class {
     var delegate: StreamBaseDelegate? { get set }
 
@@ -24,15 +66,27 @@ public protocol StreamBaseProtocol: class {
     func findIndexPath(key: String) -> NSIndexPath?
 }
 
-public enum BaseOrdering {
-    case Key
-    case Child(String)
-    // TODO Priority
-}
-
+/**
+    Surfaces a Firebase collection as a stream suitable for presenting in a table or collection.
+    In addition to basic functionality of keeping stream synched with Firebase backing store
+    and invoking a delegate with updates, it has some more advanced features:
+    
+    * Inverted streams - key for correct scrolling behavior in messaging apps.
+    * Paging - key for scalability.
+    * Predicates - for client-side filtering of result sets, including data not necessarily 
+        persisted in Firebase.
+    * Batching - invokes delegate methods only after a batch of changes have occurred.
+*/
 public class StreamBase : StreamBaseProtocol {
     public typealias Predicate = StreamBaseItem -> Bool
     public typealias Comparator = (StreamBaseItem, StreamBaseItem) -> Bool
+    public typealias QueryPager = (start: String?, end: String?, limit: Int?) -> FQuery
+
+    public enum Ordering {
+        case Key
+        case Child(String)
+        // TODO Priority
+    }
     
     private var handles = [UInt]()
     private var arrayBeforePredicate = KeyedArray<StreamBaseItem>()
@@ -40,18 +94,32 @@ public class StreamBase : StreamBaseProtocol {
     private var batchArray = KeyedArray<StreamBaseItem>()
     
     private let type: StreamBaseItem.Type!
-    private let ref: Firebase!
-    private var query: FQuery!
-    private var observer: NSObjectProtocol?
+    private let query: FQuery!
+    private let queryPager: QueryPager!
+    private let limit: Int?
     
+    /**
+        The comparator function used for sorting items.
+    */
+    public let comparator: Comparator
+    
+    private var observer: NSObjectProtocol?
     private var isBatching = false
     private var timer: NSTimer?
-    private let limit: Int?
     private var isFetchingMore = false
     private var shouldTellDelegateInitialLoadIsDone: Bool? = false
     
-    public let comparator: Comparator
+    /**
+        How long to wait for a batch of changes to accumulate before invoking delegate.
+        If nil, then there is no delay.  The unit is seconds.
+    */
     public var batchDelay: NSTimeInterval? = 0.1
+    
+    /**
+        A value used to decide whether elements are members of the stream or not.  This
+        predicate is evaluated client-side, and so scalability and under-fetching must
+        be taken into account.
+    */
     public var predicate: Predicate? {
         didSet {
             batching { a in
@@ -68,46 +136,72 @@ public class StreamBase : StreamBaseProtocol {
             }
         }
     }
+    
+    /**
+        Limit the results after predicate to this value.  If the fetch limit is combined with
+        a predicate, then under-fetching may result.
+    */
     public var afterPredicateLimit: Int?
+    
+    /**
+        The delegate to notify as the underying data changes.
+    */
     public weak var delegate: StreamBaseDelegate? {
         didSet {
             if limit == 0 {
-                delegate?.streamDidFinishInitialLoad()
+                delegate?.streamDidFinishInitialLoad(nil)
             }
         }
     }
 
-    init() {
+    /**
+        Construct an empty stream instance, not connected to any backing Firebase store.
+    */
+    public init() {
         type = nil
         limit = 0
-        ref = nil
         query = nil
+        queryPager = nil
         comparator = { $0.key < $1.key }
     }
     
-    //  TODO: Construct with a query instead of ref?
-    public init(type: StreamBaseItem.Type, ref: Firebase, limit: Int? = nil, ascending: Bool = true, ordering: BaseOrdering = .Key) {
-        self.type = type
-        self.ref = ref
-        self.limit = limit
-        (comparator, query) = StreamBase.configureQuery(ref, ascending: ascending, limit: limit, ordering: ordering)
+    /**
+        Construct a stream instance containing items of the given type at the given Firebase reference.
+
+        :param: type    The type of items in the stream.
+        :param: ref The Firebase reference where the items are stored.
+        :param: limit   The max number to fetch.
+        :param: ascending   Whether to materialize the underlying array in ascending or descending order.
+        :param: ordering    The ordering to use.
+    */
+    public convenience init(type: StreamBaseItem.Type, ref: Firebase, limit: Int? = nil, ascending: Bool = true, ordering: Ordering = .Key) {
+        let queryBuilder = QueryBuilder(ref: ref)
+        queryBuilder.limit = limit
+        queryBuilder.ascending = ascending
+        queryBuilder.ordering = ordering
+        self.init(type: type, queryBuilder: queryBuilder)
+    }
+    
+    /**
+        Construct a stream instance containing items of the given type using the query builder specification.
         
-        // NOTE we have to construct a stub instance b/c Swift1.2 doesn't yet support accessing static values in
-        // protocols.
-        if let name = type(ref: nil, dict: nil).notificationName {
-            observer = NSNotificationCenter.defaultCenter().addObserverForName(name, object: nil, queue: nil) { [weak self] notification in
-                if let s = self, t = notification.object as? StreamBaseItem where s.arrayBeforePredicate.has(t.key!) {
-                    s.handleItemChanged(t)
-                }
-            }
-        }
+        :param: type    The type of items in the stream.
+        :param: queryBuilder    The details of what firebase data to query.
+    */
+    public init(type: StreamBaseItem.Type, queryBuilder: QueryBuilder) {
+        self.type = type
+        
+        limit = queryBuilder.limit
+        comparator = queryBuilder.buildComparator()
+        query = queryBuilder.buildQuery()
+        queryPager = queryBuilder.buildQueryPager()
         
         handles.append(query.observeEventType(.ChildAdded, withBlock: { [weak self] snapshot in
             if let s = self {
-                var t = s.type(ref: snapshot.ref, dict: snapshot.value as? [String: AnyObject])
-                s.arrayBeforePredicate.append(t)
-                if s.predicate == nil || s.predicate!(t) {
-                    s.batching { $0.append(t) }
+                var item = s.type(key: snapshot.key, ref: snapshot.ref, dict: snapshot.value as? [String: AnyObject])
+                s.arrayBeforePredicate.append(item)
+                if s.predicate == nil || s.predicate!(item) {
+                    s.batching { $0.append(item) }
                 }
             }
             }))
@@ -137,11 +231,13 @@ public class StreamBase : StreamBaseProtocol {
         
         var inflight: Inflight? = Inflight()
         query.observeSingleEventOfType(.Value, withBlock: { [weak self] snapshot in
-            inflight = nil
-            self?.shouldTellDelegateInitialLoadIsDone = true
-            self?.scheduleBatch()
-            }, withCancelBlock: { error in
-                println(error)
+            if let s = self {
+                inflight = nil
+                s.shouldTellDelegateInitialLoadIsDone = true
+                s.scheduleBatch()
+            }
+            }, withCancelBlock: { [weak self] error in
+                self?.delegate?.streamDidFinishInitialLoad(error)
             })
     }
     
@@ -154,6 +250,11 @@ public class StreamBase : StreamBaseProtocol {
         }
     }
     
+    /**
+        Find the item for a given key.
+        :param: key The key to check
+        :returns:    The item or nil if not found.
+    */
     public func find(key: String) -> StreamBaseItem? {
         if let row = array.find(key) {
             return array[row]
@@ -161,6 +262,12 @@ public class StreamBase : StreamBaseProtocol {
         return nil
     }
     
+    /**
+        Find the index path for the given key.
+
+        :param: key The key to check.
+        :returns:    The index path or nil if not found.
+    */
     public func findIndexPath(key: String) -> NSIndexPath? {
         if let row = array.find(key) {
             return pathAt(row)
@@ -168,36 +275,97 @@ public class StreamBase : StreamBaseProtocol {
         return nil
     }
     
-    func findFirstIndexPathWhere(ordering: StreamBaseItem -> Bool) -> NSIndexPath? {
-        if let i = array.findFirstWhere(ordering) {
-            return pathAt(i)
+    /**
+        Find the path of the first item that would appear in the stream after the
+        exemplar item.  The exemplar item need not be in this stream.
+    
+        :param: item    The exemplar item.
+        :returns:   The index path of that first item or nil if none is found.
+    */
+    public func findFirstIndexPathAfter(item: StreamBaseItem) -> NSIndexPath? {
+        let a = array.rawArray
+        if a.isEmpty {
+            return nil
         }
-        return nil
+        
+        let predicate = { self.comparator(item, $0) }
+        var left = a.startIndex
+        var right = a.endIndex - 1
+        
+        if predicate(a.first!) {
+            return pathAt(left)
+        }
+        
+        var midpoint = a.count / 2
+        while right - left > 1 {
+            if predicate(a[midpoint]) {
+                right = midpoint
+            } else {
+                left = midpoint
+            }
+            midpoint = (left + right) / 2
+        }
+        return predicate(a[left]) ? pathAt(left) : predicate(a[right]) ? pathAt(right) : nil
     }
     
-    func findLastIndexPathWhere(ordering: StreamBaseItem -> Bool) -> NSIndexPath? {
-        if let i = array.findLastWhere(ordering) {
-            return pathAt(i)
+    /**
+        Find the path of the last item that would appear in the stream before the
+        exemplar item.  The exemplar item need not be in this stream.
+        
+        :param: item    The exemplar item.
+        :returns:   The index path of that first item or nil if none is found.
+    */
+    public func findLastIndexPathBefore(item: StreamBaseItem) -> NSIndexPath? {
+        let a = array.rawArray
+        if a.isEmpty {
+            return nil
         }
-        return nil
+        let predicate = { self.comparator($0, item) }
+        var left = array.startIndex
+        var right = array.endIndex - 1
+        
+        if predicate(a.last!) {
+            return pathAt(right)
+        }
+        
+        var midpoint = a.count / 2
+        while right - left > 1 {
+            if predicate(a[midpoint]) {
+                left = midpoint
+            } else {
+                right = midpoint
+            }
+            midpoint = (left + right) / 2
+        }
+        return predicate(a[right]) ? pathAt(right) : (predicate(a[left]) ? pathAt(left) : nil)
     }
     
-    public func fetchMore(count: Int, offset: String, done: (Void -> Void)? = nil) {
+    /**
+        Request to fetch more content at a given offset.
+    
+        If there is already an ongoing fetch, does not issue another fetch but does invoke done callback.
+
+        :param: count   The number of items to fetch.
+        :param: start  The offset (key) at which to start fetching (inclusive).
+        :param: end  The offset (key) at which to end fetching (inclusive).
+        :param: done    A callback invoked when the fetch is done.
+    */
+    public func fetchMore(count: Int, start: String, end: String? = nil, done: (Void -> Void)? = nil) {
         if arrayBeforePredicate.count == 0 || isFetchingMore {
+            done?()
             return
         }
         isFetchingMore = true
-        // TODO fix for non-key orderings and check ascending
-        let query = ref.queryOrderedByKey().queryEndingAtValue(offset).queryLimitedToLast(UInt(count + 1))
+        let fetchMoreQuery = queryPager(start: start, end: end, limit: count + 1)
         let inflight = Inflight()
-        query.observeSingleEventOfType(.Value, withBlock: { snapshot in
+        fetchMoreQuery.observeSingleEventOfType(.Value, withBlock: { snapshot in
             let i = inflight
             self.isFetchingMore = false
             self.batching { a in
                 if let result = snapshot.value as? [String: [String: AnyObject]] {
                     for (key, dict) in result {
                         if self.arrayBeforePredicate.find(key) == nil {
-                            var t = self.type(ref: self.ref.childByAppendingPath(key), dict: dict)
+                            var t = self.type(key: key, ref: snapshot.ref.childByAppendingPath(key), dict: dict)
                             self.arrayBeforePredicate.append(t)
                             if self.predicate == nil || self.predicate!(t) {
                                 a.append(t)
@@ -210,75 +378,39 @@ public class StreamBase : StreamBaseProtocol {
         })
     }
     
-    // Set up both server-side and client side orderings.
-    private static func configureQuery(ref: Firebase, ascending: Bool, limit: Int?, ordering: BaseOrdering) -> (Comparator, FQuery!) {
-        let comp: Comparator
-        var query: FQuery
-        switch ordering {
-        case .Key:
-            query = ref.queryOrderedByKey()
-            comp = { (a, b) in a.key < b.key }
-        case .Child(let key):
-            query = ref.queryOrderedByChild(key)
-            // https://www.firebase.com/docs/web/guide/retrieving-data.html#section-ordered-data
-            // TODO: Compare unlike types.
-            comp = { (a, b) in
-                let av: AnyObject? = a.dict[key] ?? NSNull()
-                let bv: AnyObject? = b.dict[key] ?? NSNull()
-                switch (av, bv) {
-                case (let _ as NSNull, let _ as NSNull):
-                    break
-                case (let _ as NSNull, _):
-                    return true
-                case (_, let _ as NSNull):
-                    return false
-                case (let astr as String, let bstr as String):
-                    if astr != bstr {
-                        return astr < bstr
-                    }
-                case (let aflt as Float, let bflt as Float):  // NOTE: Includes Int
-                    if aflt != bflt {
-                        return aflt < bflt
-                    }
-                case (let abool as Bool, let bbool as Bool):
-                    if abool != bbool {
-                        return !abool
-                    }
-                default:
-                    break
-                }
-                return a.key < b.key
-            }
+    /**
+        Called to notify the stream that an item in it has changed which may affect the predicate
+        or sort order.
+
+        :param: item    The item that changed.
+    */
+    public func handleItemChanged(item: StreamBaseItem) {
+        if item.key == nil || !arrayBeforePredicate.has(item.key!) {
+            return
         }
-        if let l = limit {
-            query = (ascending) ? query.queryLimitedToFirst(UInt(l)) : query.queryLimitedToLast(UInt(l))
-        }
-        return ((ascending) ? comp : { comp($1, $0) }, query)
-    }
-    
-    private func handleItemChanged(t: StreamBaseItem) {
+        
         // This change might invalidate an in-flight batch - eg, when changing the predicate.
         finishOutstandingBatch()
         
         var prevPath: NSIndexPath? = nil
-        if let row = array.find(t.key!) {
+        if let row = array.find(item.key!) {
             prevPath = pathAt(row)
         }
         let prev = prevPath != nil
-        let cur = predicate == nil || predicate!(t)
+        let cur = predicate == nil || predicate!(item)
         switch (prev, cur) {
         case (true, true):
             delegate?.streamItemsChanged([prevPath!])
         case (true, false):
             batching { a in
-                if let newRow = a.find(t.key!) {
+                if let newRow = a.find(item.key!) {
                     a.removeAtIndex(newRow)
                 }
             }
         case (false, true):
             batching { a in
-                if a.find(t.key!) == nil {
-                    a.append(t)
+                if a.find(item.key!) == nil {
+                    a.append(item)
                 }
             }
         default:
@@ -286,7 +418,16 @@ public class StreamBase : StreamBaseProtocol {
         }
     }
     
-    func batching(fn: KeyedArray<StreamBaseItem> -> Void) {
+    /**
+        Subclasses should call this function to make changes to the underlying array of items.
+        The callback will be invoked with the current state of the array, which the caller
+        can then manipulate.  After some time (@batchDelay), all changes are coallesced and
+        delegates are notified.  Note that the order of elements in the array passed to the 
+        callback is ignored, so appending is always preferred to insertion.
+
+        :param: fn  The function the client provides to manipulate the array.
+    */
+    public func batching(fn: KeyedArray<StreamBaseItem> -> Void) {
         if !isBatching {
             batchArray.reset(array)
         }
@@ -311,12 +452,12 @@ public class StreamBase : StreamBaseProtocol {
             timer?.invalidate()
             isBatching = false
             
-            // TODO: Is it possible to remove this sort()?
-            sort(&batchArray.rawArray, comparator)
-            StreamBase.applyBatch(array, batch: batchArray.rawArray, delegate: delegate, limit: afterPredicateLimit)
+            let sortedBatch = sorted(batchArray.rawArray, comparator)
+            StreamBase.applyBatch(array, batch: sortedBatch, delegate: delegate, limit: afterPredicateLimit)
+            
             if shouldTellDelegateInitialLoadIsDone == true {
                 shouldTellDelegateInitialLoadIsDone = nil
-                delegate?.streamDidFinishInitialLoad()
+                delegate?.streamDidFinishInitialLoad(nil)
             }
         }
     }
@@ -343,8 +484,10 @@ public class StreamBase : StreamBaseProtocol {
         }
     }
     
-    // Given *sorted* arrays from and to, produce the deletes (indexed in from)
-    // and adds (indexed in to) that are required to transform <from> to <to>.
+    /**
+        Given *sorted* arrays <from> and <to>, produce the deletes (indexed in from)
+        and adds (indexed in to) that are required to transform <from> to <to>.
+    */
     private class func diffFrom(from: [StreamBaseItem], to: [StreamBaseItem]) -> ([Int], [Int]) {
         var deletes = [Int]()
         var adds = [Int]()

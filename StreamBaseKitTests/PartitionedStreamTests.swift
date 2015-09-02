@@ -31,7 +31,7 @@ class PartitionedStreamTests: XCTestCase {
     
     func verifyMap(pstream: PartitionedStream) {
         var revMap = [NSIndexPath: Int]()
-        for (i, p) in enumerate(pstream.mapForTesting) {
+        for (i, p) in enumerate(pstream.map) {
             revMap[p] = i
             XCTAssertEqual(stream[i].key!, pstream[p].key!)
         }
@@ -48,7 +48,7 @@ class PartitionedStreamTests: XCTestCase {
     
     func dumpMap(pstream: PartitionedStream) {
         var revMap = [NSIndexPath: Int]()
-        for (i, p) in enumerate(pstream.mapForTesting) {
+        for (i, p) in enumerate(pstream.map) {
             if i < stream.count {
                 println("F: \(i): \(p.section)/\(p.row) -> \(stream[i].key!)")
             } else {
@@ -168,13 +168,13 @@ class PartitionedStreamTests: XCTestCase {
         }
         let keys = Array("abcdefghijklmnopqrstuvwxyz9876543210ABCDEFGHIJKLMNOPQRSTUVWXYZ").map{ String($0) }
         for key in keys {
-            let snap = FakeSnapshot(key: key, value: [:])
+            let snap = FakeSnapshot(key: key)
             ref.add(snap)
         }
         verifyMap(pstream)
         
         for key in ["a", "A", "3", "2", "1"] {
-            let snap = FakeSnapshot(key: key, value: [:])
+            let snap = FakeSnapshot(key: key)
             ref.remove(snap)
         }
         verifyMap(pstream)
