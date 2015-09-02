@@ -77,7 +77,10 @@ public class UnionStream {
     }
     
     func didFinishInitialLoad(error: NSError?) {
-        self.error = error
+        if let e = error where self.error == nil {
+            self.error = e
+            // Any additional errors are ignored.
+        }
         numStreamsFinished?++
         needsUpdate()
     }
