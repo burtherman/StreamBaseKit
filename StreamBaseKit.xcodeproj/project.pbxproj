@@ -38,9 +38,9 @@
 		99B8FBDDB42E486A42011A20 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E74D47C11B967E5C0053C937 /* KeyedArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyedArrayTests.swift; sourceTree = "<group>"; };
 		E78988BA1B95634C0049A942 /* StreamBaseKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StreamBaseKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		E78988D61B9563D20049A942 /* Inflight.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Inflight.swift; path = ../Inflight.swift; sourceTree = "<group>"; };
+		E78988D61B9563D20049A942 /* Inflight.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Inflight.swift; sourceTree = "<group>"; };
 		E78988D71B9563D20049A942 /* KeyedArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyedArray.swift; sourceTree = "<group>"; };
-		E78988D81B9563D20049A942 /* NSTimer+Closure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSTimer+Closure.swift"; path = "../NSTimer+Closure.swift"; sourceTree = "<group>"; };
+		E78988D81B9563D20049A942 /* NSTimer+Closure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSTimer+Closure.swift"; sourceTree = "<group>"; };
 		E78988D91B9563D20049A942 /* StreamBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamBase.swift; sourceTree = "<group>"; };
 		E78988DA1B9563D20049A942 /* StreamBaseItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamBaseItem.swift; sourceTree = "<group>"; };
 		E78988E71B95747A0049A942 /* Fakebase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fakebase.swift; sourceTree = "<group>"; };
