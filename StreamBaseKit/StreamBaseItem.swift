@@ -3,10 +3,9 @@
 //  StreamBaseKit
 //
 //  Created by Steve Farrell on 8/31/15.
-//  Copyright (c) 2015 Steve Farrell. All rights reserved.
+//  Copyright (c) 2015 Movem3nt, Inc. All rights reserved.
 //
 
-/*
 import Firebase
 
 public func ==(lhs: StreamBaseItem, rhs: StreamBaseItem) -> Bool {
@@ -14,9 +13,13 @@ public func ==(lhs: StreamBaseItem, rhs: StreamBaseItem) -> Bool {
 }
 
 public class StreamBaseItem: KeyedObject, Equatable {
-    public var key: String?
+    public var key: String? {
+        get {
+            return ref?.key
+        }
+    }
     
-    public var parentRef: Firebase?
+    public var ref: Firebase?
     
     public var dict: [String: AnyObject] {
         return [:]
@@ -26,9 +29,8 @@ public class StreamBaseItem: KeyedObject, Equatable {
         return nil
     }
     
-    public required init(key: String?, parentRef: Firebase?, dict: [String: AnyObject]?) {
-        self.key = key
-        self.parentRef = parentRef
+    public required init(ref: Firebase?, dict: [String: AnyObject]?) {
+        self.ref = ref
         if let d = dict {
             update(d)
         }
@@ -36,5 +38,8 @@ public class StreamBaseItem: KeyedObject, Equatable {
     
     public func update(dict: [String: AnyObject]) {
     }
+    
+    public func clone() -> StreamBaseItem {
+        return self.dynamicType(ref: ref, dict: dict)
+    }
 }
-*/

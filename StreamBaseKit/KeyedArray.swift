@@ -3,9 +3,9 @@
 //  StreamBaseKit
 //
 //  Created by Steve Farrell on 8/31/15.
-//  Copyright (c) 2015 Steve Farrell and Movem3nt, Inc. All rights reserved.
+//  Copyright (c) 2015 Movem3nt, Inc. All rights reserved.
 //
-//  A Collection that wraps both an array and dictionary.  It has O(1) access
+//  A Collection that wraps both an array and dictionary.  It has O(1) access 
 //  by index or key and for appends, but is O(n) for inserts and deletes.
 
 import Foundation
@@ -14,11 +14,13 @@ public protocol KeyedObject: class {
     var key: String? { get }
 }
 
-public class KeyedArray<T: KeyedObject> : CollectionType {
-    public var rawArray = [T]()  // TODO shouldn't be public
+public class KeyedArray<T: KeyedObject> {
+    var rawArray = [T]()
     private var index = [String: Int]()
     
-    public init() { }
+    public convenience init(ts: T...) {
+        self.init(rawArray: ts)
+    }
     
     public init(rawArray: [T]) {
         for t in rawArray {
@@ -36,9 +38,8 @@ public class KeyedArray<T: KeyedObject> : CollectionType {
     public func has(key: String) -> Bool {
         return find(key) != nil
     }
-    
-    // TODO: replace with findPrevious(key)/findNext(key) that depends on the existing
-    // ordering.
+
+    // TODO: should use existing ordering, no need to pass in predicate
     public func findFirstWhere(predicate: T -> Bool) -> Int? {
         if rawArray.isEmpty {
             return nil
@@ -63,6 +64,7 @@ public class KeyedArray<T: KeyedObject> : CollectionType {
         return predicate(rawArray[left]) ? left : (predicate(rawArray[right]) ? right : nil)
     }
     
+    // TODO: should use existing ordering, no need to pass in predicate
     public func findLastWhere(predicate: T -> Bool) -> Int? {
         if rawArray.isEmpty {
             return nil
@@ -132,7 +134,9 @@ public class KeyedArray<T: KeyedObject> : CollectionType {
             append(t)
         }
     }
-    
+}
+
+extension KeyedArray : CollectionType {
     public var count: Int {
         return rawArray.count
     }

@@ -3,7 +3,7 @@
 //  StreamBaseKit
 //
 //  Created by Steve Farrell on 8/31/15.
-//  Copyright (c) 2015 Steve Farrell. All rights reserved.
+//  Copyright (c) 2015 Movem3nt, Inc. All rights reserved.
 //
 //  Based on https://gist.github.com/natecook1000/b0285b518576b22c4dc8
 

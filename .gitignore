@@ -23,3 +23,6 @@ DerivedData
 # Generated
 /target
 /site
+
+# cocoapods
+Pods

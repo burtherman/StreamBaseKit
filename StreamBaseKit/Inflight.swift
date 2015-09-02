@@ -2,18 +2,17 @@
 //  Inflight.swift
 //  StreamBaseKit
 //
-//  Created by Steve Farrell on 8/31/15.
-//  Copyright (c) 2015 Steve Farrell. All rights reserved.
+//  Created by Steve Farrell on 4/30/15.
+//  Copyright (c) 2015 Movem3nt, Inc. All rights reserved.
 //
-
 //  RAII interface for network activity indicator: simply keep an Inflight object
 //  in scope for the duration of the request.  As long as you're not leaking Inflight
 //  objects, the underlying counter will remain accurate.  There are a few ways to make
 //  sure this works with closures.  I recommend this pattern:
 //
 //  var inflight : Inflight? = Inflight()
-//  doSomethingInBackground() {
-//      inflight = nil
+//  doSomethingInBackground() { 
+//    inflight = nil
 //  }
 
 import UIKit
@@ -47,6 +46,7 @@ private class InflightManager {
 }
 
 class Inflight {
+
     init() {
         InflightManager.sharedManager.increment()
     }

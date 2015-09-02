@@ -3,11 +3,10 @@
 //  StreamBaseKit
 //
 //  Created by Steve Farrell on 8/31/15.
-//  Copyright (c) 2015 Steve Farrell. All rights reserved.
+//  Copyright (c) 2015 Movem3nt, Inc. All rights reserved.
 //
 
 import Firebase
-/*
 
 public protocol StreamBaseDelegate: class {
     func streamWillChange()
@@ -20,7 +19,7 @@ public protocol StreamBaseDelegate: class {
 
 public protocol StreamBaseProtocol: class {
     var delegate: StreamBaseDelegate? { get set }
-    
+
     func find(key: String) -> StreamBaseItem?
     func findIndexPath(key: String) -> NSIndexPath?
 }
@@ -77,7 +76,7 @@ public class StreamBase : StreamBaseProtocol {
             }
         }
     }
-    
+
     init() {
         type = nil
         limit = 0
@@ -86,6 +85,7 @@ public class StreamBase : StreamBaseProtocol {
         comparator = { $0.key < $1.key }
     }
     
+    //  TODO: Construct with a query instead of ref?
     public init(type: StreamBaseItem.Type, ref: Firebase, limit: Int? = nil, ascending: Bool = true, ordering: BaseOrdering = .Key) {
         self.type = type
         self.ref = ref
@@ -94,7 +94,7 @@ public class StreamBase : StreamBaseProtocol {
         
         // NOTE we have to construct a stub instance b/c Swift1.2 doesn't yet support accessing static values in
         // protocols.
-        if let name = type(key: nil, parentRef: nil, dict: nil).notificationName {
+        if let name = type(ref: nil, dict: nil).notificationName {
             observer = NSNotificationCenter.defaultCenter().addObserverForName(name, object: nil, queue: nil) { [weak self] notification in
                 if let s = self, t = notification.object as? StreamBaseItem where s.arrayBeforePredicate.has(t.key!) {
                     s.handleItemChanged(t)
@@ -104,7 +104,7 @@ public class StreamBase : StreamBaseProtocol {
         
         handles.append(query.observeEventType(.ChildAdded, withBlock: { [weak self] snapshot in
             if let s = self {
-                var t = s.type(key: snapshot.key, parentRef: ref, dict: snapshot.value as? [String: AnyObject])
+                var t = s.type(ref: snapshot.ref, dict: snapshot.value as? [String: AnyObject])
                 s.arrayBeforePredicate.append(t)
                 if s.predicate == nil || s.predicate!(t) {
                     s.batching { $0.append(t) }
@@ -142,7 +142,7 @@ public class StreamBase : StreamBaseProtocol {
             self?.scheduleBatch()
             }, withCancelBlock: { error in
                 println(error)
-        })
+            })
     }
     
     deinit {
@@ -187,6 +187,7 @@ public class StreamBase : StreamBaseProtocol {
             return
         }
         isFetchingMore = true
+        // TODO fix for non-key orderings and check ascending
         let query = ref.queryOrderedByKey().queryEndingAtValue(offset).queryLimitedToLast(UInt(count + 1))
         let inflight = Inflight()
         query.observeSingleEventOfType(.Value, withBlock: { snapshot in
@@ -196,7 +197,7 @@ public class StreamBase : StreamBaseProtocol {
                 if let result = snapshot.value as? [String: [String: AnyObject]] {
                     for (key, dict) in result {
                         if self.arrayBeforePredicate.find(key) == nil {
-                            var t = self.type(key: key, parentRef: self.ref, dict: dict)
+                            var t = self.type(ref: self.ref.childByAppendingPath(key), dict: dict)
                             self.arrayBeforePredicate.append(t)
                             if self.predicate == nil || self.predicate!(t) {
                                 a.append(t)
@@ -310,6 +311,7 @@ public class StreamBase : StreamBaseProtocol {
             timer?.invalidate()
             isBatching = false
             
+            // TODO: Is it possible to remove this sort()?
             sort(&batchArray.rawArray, comparator)
             StreamBase.applyBatch(array, batch: batchArray.rawArray, delegate: delegate, limit: afterPredicateLimit)
             if shouldTellDelegateInitialLoadIsDone == true {
@@ -341,7 +343,7 @@ public class StreamBase : StreamBaseProtocol {
         }
     }
     
-    // Given *sorted* arrays <from> and <to>, produce the deletes (indexed in from)
+    // Given *sorted* arrays from and to, produce the deletes (indexed in from)
     // and adds (indexed in to) that are required to transform <from> to <to>.
     private class func diffFrom(from: [StreamBaseItem], to: [StreamBaseItem]) -> ([Int], [Int]) {
         var deletes = [Int]()
@@ -379,4 +381,3 @@ extension StreamBase : SequenceType {
         return array.generate()
     }
 }
-*/
