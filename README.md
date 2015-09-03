@@ -1,6 +1,6 @@
 # StreamBaseKit - UI toolkit for Firebase
 
-StreamBaseKit is a Swift UI toolkit for [Firebase](https://www.firebase.com) using streams.  Streams are synched with Firebase in real time, and can be incrementally fetched, combined, or split into multiple table sections.
+StreamBaseKit is a Swift UI toolkit for [Firebase](https://www.firebase.com).  It wraps Firebase Queries in streams that are synched with Firebase in real time.  Streams can be incrementally fetched, combined, or split into multiple sections.
 
 ## Installing StreamBaseKit
 
