@@ -12,8 +12,8 @@ import UIKit
 
 /**
     An adapter for connecting streams to table views.  Optionally you can set
-    the section, which is useful for attaching differents stream to different
-    table view sections.  For example,
+    the section, which is useful for attaching different streams to different
+    sections.  For example,
 
 ```
 class MyViewController : UIViewController {
@@ -53,6 +53,7 @@ public class StreamTableViewAdapter : StreamBaseDelegate {
     public init(tableView: UITableView, section: Int? = nil) {
         self.tableView = tableView
         self.section = section
+        tableView.reloadData()
     }
     
     public func streamWillChange() {
