@@ -38,7 +38,7 @@ public class UnionStream {
         is used for the union.
         :param: sources The substreams.
     */
-    public init(sources: [StreamBase]) {
+    public init(sources: StreamBase...) {
         precondition(sources.count > 0)
         self.sources = sources
         delegates = sources.map{ UnionStreamDelegate(source: $0) }

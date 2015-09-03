@@ -22,6 +22,7 @@
 		E789892B1B9664F60049A942 /* StreamBaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78988EB1B9574890049A942 /* StreamBaseTests.swift */; };
 		E789892E1B96675C0049A942 /* PartitionedStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = E789892D1B96675C0049A942 /* PartitionedStream.swift */; };
 		E78989321B966A610049A942 /* UnionStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78989311B966A610049A942 /* UnionStream.swift */; };
+		E7A021E81B98C1E400D9C3AB /* TransientStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A021E71B98C1E400D9C3AB /* TransientStream.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		E789891F1B96647C0049A942 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E789892D1B96675C0049A942 /* PartitionedStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PartitionedStream.swift; sourceTree = "<group>"; };
 		E78989311B966A610049A942 /* UnionStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnionStream.swift; sourceTree = "<group>"; };
+		E7A021E71B98C1E400D9C3AB /* TransientStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransientStream.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,11 +110,12 @@
 			isa = PBXGroup;
 			children = (
 				E78988D71B9563D20049A942 /* KeyedArray.swift */,
-				E716BBE71B97A18000944296 /* QueryBuilder.swift */,
-				E74D47C51B9684180053C937 /* StreamTableViewAdapter.swift */,
 				E789892D1B96675C0049A942 /* PartitionedStream.swift */,
+				E716BBE71B97A18000944296 /* QueryBuilder.swift */,
 				E78988D91B9563D20049A942 /* StreamBase.swift */,
 				E78988DA1B9563D20049A942 /* StreamBaseItem.swift */,
+				E74D47C51B9684180053C937 /* StreamTableViewAdapter.swift */,
+				E7A021E71B98C1E400D9C3AB /* TransientStream.swift */,
 				E78989311B966A610049A942 /* UnionStream.swift */,
 				E78989331B966B690049A942 /* Util */,
 			);
@@ -300,6 +303,7 @@
 			files = (
 				E78988DD1B9563D20049A942 /* NSTimer+Closure.swift in Sources */,
 				E78988DC1B9563D20049A942 /* KeyedArray.swift in Sources */,
+				E7A021E81B98C1E400D9C3AB /* TransientStream.swift in Sources */,
 				E74D47C61B9684180053C937 /* StreamTableViewAdapter.swift in Sources */,
 				E78989321B966A610049A942 /* UnionStream.swift in Sources */,
 				E78988DE1B9563D20049A942 /* StreamBase.swift in Sources */,

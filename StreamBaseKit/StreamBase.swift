@@ -80,7 +80,7 @@ public protocol StreamBaseProtocol: class {
 public class StreamBase : StreamBaseProtocol {
     public typealias Predicate = StreamBaseItem -> Bool
     public typealias Comparator = (StreamBaseItem, StreamBaseItem) -> Bool
-    public typealias QueryPager = (start: String?, end: String?, limit: Int?) -> FQuery
+    public typealias QueryPager = (start: AnyObject?, end: AnyObject?, limit: Int?) -> FQuery
 
     public enum Ordering {
         case Key
@@ -427,7 +427,7 @@ public class StreamBase : StreamBaseProtocol {
 
         :param: fn  The function the client provides to manipulate the array.
     */
-    public func batching(fn: KeyedArray<StreamBaseItem> -> Void) {
+    func batching(fn: KeyedArray<StreamBaseItem> -> Void) {
         if !isBatching {
             batchArray.reset(array)
         }

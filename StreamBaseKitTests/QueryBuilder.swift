@@ -35,6 +35,18 @@ public class QueryBuilder {
     public var ordering = StreamBase.Ordering.Key
     
     /**
+        Where to start querying.  If ordering is key this is a key, otherwise it
+        is a child value.
+    */
+    public var start: AnyObject?
+
+    /**
+        Where to end querying.  If ordering is key this is a key, otherwise it
+        is a child value.
+    */
+    public var end: AnyObject?
+
+    /**
         Construct a builder.
 
         :param: ref The firebase ref for the collection.
@@ -92,10 +104,10 @@ public class QueryBuilder {
         }
         return { (start, end, limit) in
             if self.ascending {
-                if let s = start {
+                if let s: AnyObject = start {
                     query = query.queryStartingAtValue(s)
                 }
-                if let e = end {
+                if let e: AnyObject = end {
                     query = query.queryEndingAtValue(e)
                 }
                 if let l = limit {
@@ -103,10 +115,10 @@ public class QueryBuilder {
                 }
                 return query
             } else {
-                if let s = start {
+                if let s: AnyObject = start {
                     query = query.queryEndingAtValue(s)
                 }
-                if let e = end {
+                if let e: AnyObject = end {
                     query = query.queryStartingAtValue(e)
                 }
                 if let l = limit {
@@ -118,6 +130,6 @@ public class QueryBuilder {
     }
     
     func buildQuery() -> FQuery {
-        return buildQueryPager()(start: nil, end: nil, limit: limit)
+        return buildQueryPager()(start: start, end: end, limit: limit)
     }
 }
