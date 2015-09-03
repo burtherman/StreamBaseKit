@@ -139,8 +139,8 @@ PartitionedStream is convenient to use, but if the underlying data has hundreds 
 class MyViewController : UIViewController {
   var organizerStream: StreamBase!
   var participantStream: StreamBase!
-  var organizerAdapter: StreamTableViewAdapater!
-  var participantAdapter: StreamTableViewAdapater!
+  var organizerAdapter: StreamTableViewAdapter!
+  var participantAdapter: StreamTableViewAdapter!
   // etc...
 
   override func viewDidLoad() {
@@ -150,14 +150,14 @@ class MyViewController : UIViewController {
     organizerQuery.ordering = .Child("is_organizer")
     organizerQuery.start = true
     organizerStream = StreamBase(type: User.self, queryBuilder: organizerQuery)
-    organizerAdapater = StreamTableViewAdapter(tableView: tableView, section: 0)
+    organizerAdapter = StreamTableViewAdapter(tableView: tableView, section: 0)
 
     let participantQuery = QueryBuilder(ref)
     participantQuery.limit = 100
     participantQuery.ordering = .Child("is_organizer")
     participantQuery.end = false
     participantStream = StreamBase(type: User.self, queryBuilder: participantQuery)
-    participantAdapater = StreamTableViewAdapter(tableView: tableView, section: 1)
+    participantAdapter = StreamTableViewAdapter(tableView: tableView, section: 1)
   }
 }
   
