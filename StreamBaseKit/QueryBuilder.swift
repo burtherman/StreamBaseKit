@@ -8,12 +8,49 @@
 import Foundation
 import Firebase
 
+/**
+    Helper for constructing queries.  This is needed because StreamBase does a lot
+    of client side processing, and so needs to duplicate some functionality of the 
+    Firebase query.  Additionally, it's not possible to inspect FQuery, so instead
+    we generate FQuery objects based on specs provided here.
+*/
 public class QueryBuilder {
-    public var ref: Firebase
+    var ref: Firebase
+    
+    /**
+        The maximum number of results to return.  If nil, the whole collection is
+        fetched (or at least attempted to be...)
+    */
     public var limit: Int?
+    
+    /**
+        Whether to present the collection in ascending (default, Firebase native)
+        or descending order.  The latter is needed for messaging apps.
+    */
     public var ascending = true
+    
+    /**
+        The sort order.
+    */
     public var ordering = StreamBase.Ordering.Key
     
+    /**
+        Where to start querying.  If ordering is key this is a key, otherwise it
+        is a child value.
+    */
+    public var start: AnyObject?
+
+    /**
+        Where to end querying.  If ordering is key this is a key, otherwise it
+        is a child value.
+    */
+    public var end: AnyObject?
+
+    /**
+        Construct a builder.
+
+        :param: ref The firebase ref for the collection.
+    */
     public init(ref: Firebase) {
         self.ref = ref
     }
@@ -67,10 +104,10 @@ public class QueryBuilder {
         }
         return { (start, end, limit) in
             if self.ascending {
-                if let s = start {
+                if let s: AnyObject = start {
                     query = query.queryStartingAtValue(s)
                 }
-                if let e = end {
+                if let e: AnyObject = end {
                     query = query.queryEndingAtValue(e)
                 }
                 if let l = limit {
@@ -78,10 +115,10 @@ public class QueryBuilder {
                 }
                 return query
             } else {
-                if let s = start {
+                if let s: AnyObject = start {
                     query = query.queryEndingAtValue(s)
                 }
-                if let e = end {
+                if let e: AnyObject = end {
                     query = query.queryStartingAtValue(e)
                 }
                 if let l = limit {
@@ -93,6 +130,6 @@ public class QueryBuilder {
     }
     
     func buildQuery() -> FQuery {
-        return buildQueryPager()(start: nil, end: nil, limit: limit)
+        return buildQueryPager()(start: start, end: end, limit: limit)
     }
 }
