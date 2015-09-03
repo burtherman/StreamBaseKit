@@ -229,3 +229,5 @@ extension MyViewController : StreamBaseDelegate {
 # Comparison with FirebaseUI-iOS
 
 [FirebaseUI-iOS](https://github.com/firebase/FirebaseUI-iOS) is the official client library for Firebase.  It's written in Objective-C instead of Swift, and is simpler overall.  StreamBaseKit grew out of a real world social application and addresses a variety of problems encountered in doing so.  For example, ios table views are designed for insertion on top, and Firebase appends new data.  To make these work well together for messaging-type apps, one needs to invert both the firebase collection and the table view.  StreamBaseKit also makes it easy to add more complex functionality like splitting a collection into multiple table sections, and inserting transient content into the table like a "fetch more" control for incremental fetching.
+
+Another consideration is that Firebase also has a Android UI library. StreamBaseKit does not (yet).
