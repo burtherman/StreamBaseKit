@@ -19,9 +19,9 @@ import UIKit
 class MyViewController : UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        stream1.delegate = StreamTableViewAdapter(tableView: tableView, section: 0)
-        stream2.delegate = StreamTableViewAdapter(tableView: tableView, section: 1)
-        stream3.delegate = StreamTableViewAdapter(tableView: tableView, section: 2)
+        stream1?.delegate = StreamTableViewAdapter(tableView: tableView, section: 0)
+        stream2?.delegate = StreamTableViewAdapter(tableView: tableView, section: 1)
+        stream3?.delegate = StreamTableViewAdapter(tableView: tableView, section: 2)
         // ...
     }
 }
@@ -49,6 +49,7 @@ extension MyViewContoller : UITableViewDataSource {
 public class StreamTableViewAdapter : StreamBaseDelegate {
     let tableView: UITableView
     let section: Int?
+    var isInitialLoad = true
     
     public init(tableView: UITableView, section: Int? = nil) {
         self.tableView = tableView
@@ -61,7 +62,13 @@ public class StreamTableViewAdapter : StreamBaseDelegate {
     }
     
     public func streamDidChange() {
-        tableView.endUpdates()
+        if isInitialLoad {
+            UIView.animateWithDuration(0) {
+                self.tableView.endUpdates()
+            }
+        } else {
+            tableView.endUpdates()
+        }
     }
     
     public func streamItemsAdded(paths: [NSIndexPath]) {
@@ -92,5 +99,6 @@ public class StreamTableViewAdapter : StreamBaseDelegate {
     }
     
     public func streamDidFinishInitialLoad(error: NSError?) {
+        isInitialLoad = false
     }
 }
