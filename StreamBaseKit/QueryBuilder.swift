@@ -9,10 +9,12 @@ import Foundation
 import Firebase
 
 /**
-    Helper for constructing queries.  This is needed because StreamBase does a lot
-    of client side processing, and so needs to duplicate some functionality of the 
-    Firebase query.  Additionally, it's not possible to inspect FQuery, so instead
-    we generate FQuery objects based on specs provided here.
+    Helper for constructing queries.  
+
+    NOTE: This is needed because StreamBase does a lot of client side processing, 
+    and so needs to duplicate some functionality of the Firebase query.  
+    Additionally, it's not possible to inspect FQuery, so instead we generate FQuery 
+    objects based on specs provided here.
 */
 public class QueryBuilder {
     var ref: Firebase
