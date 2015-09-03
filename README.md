@@ -25,13 +25,14 @@ To use StreamBaseKit, you'll want to know about these classes:
 
 Class  |  Description
 -------|-------------
-StreamBase | This is the main class that exposes a Firebase query as a Stream
-StreamBaseItem | Base class for objects that appear in streams
-StreamTableViewAdapter | Adapter from streams to UITableViews
-PartitionedStream | Split a stream into multiple sections
-TransientStream |  Stream that's not connected to Firebase
-UnionStream |  Stream for merging multiple streams
-QueryBuilder | Helper for composing Firebase queries
+StreamBase | This is the main class that exposes a Firebase query as a Stream.
+StreamBaseItem | Base class for objects that appear in streams.
+StreamBaseDelegate | Delegate that is notified of stream changes.
+StreamTableViewAdapter | Adapter from streams to UITableViews.
+PartitionedStream | Split a stream into multiple sections.
+TransientStream |  Stream that's not connected to Firebase.
+UnionStream |  Stream for merging multiple streams.
+QueryBuilder | Helper for composing Firebase queries.
 
 To get started, you'll need to build from StreamBaseItem and StreamBase.  Additionally, StreamTableViewAdapter provides some convenient functionality to connect streams with tables.  Here's the basic outline:
 
