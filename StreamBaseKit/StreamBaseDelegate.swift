@@ -17,36 +17,36 @@ import Foundation
 */
 public protocol StreamBaseDelegate: class {
     /**
-    A batch of changes is beginning.
+        A batch of changes is beginning.
     */
     func streamWillChange()
     
     /**
-    A batch of changes has ended.
+        A batch of changes has ended.
     */
     func streamDidChange()
     
     /**
-    Several items have been added.  These paths indicate where these items will appear
-    after the update.
+        Several items have been added.  These paths indicate where these items will appear
+        after the update.
     */
     func streamItemsAdded(paths: [NSIndexPath])
     
     /**
-    Several items have been deleted.  These paths indicate where in the original table
-    or collection them items were.
+        Several items have been deleted.  These paths indicate where in the original table
+        or collection them items were.
     */
     func streamItemsDeleted(paths: [NSIndexPath])
     
     /**
-    Several items have changed.
+        Several items have changed.
     */
     func streamItemsChanged(paths: [NSIndexPath])
     
     /**
-    The initial fetch has completed.  Only called once.
-    
-    :param: error   Error, if any.
+        The initial fetch has completed.  Only called once.
+        
+        :param: error   Error, if any.
     */
     func streamDidFinishInitialLoad(error: NSError?)
 }

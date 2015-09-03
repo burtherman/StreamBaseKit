@@ -209,6 +209,7 @@ public class StreamBase : StreamBaseProtocol {
     
     /**
         Find the item for a given key.
+    
         :param: key The key to check
         :returns:    The item or nil if not found.
     */
