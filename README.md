@@ -125,7 +125,7 @@ extension MyViewController : UITableViewDataSource {
   }
 
   func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-    return pstream?.sectionTitles[section]
+    return pstream.sectionTitles[section]
   }
 }
 
@@ -169,11 +169,11 @@ extension MyViewController : UITableViewDataSource {
 
   func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCellWithIdentifier("MyCell", forIndexPath: indexPath)
-    let item: User
+    let user: User
     if indexPath.section == 0 {
-      item = organizerStream[indexPath.row] as! User
+      user = organizerStream[indexPath.row] as! User
     } else {
-      item = participantStream[indexPath.row] as! User
+      user = participantStream[indexPath.row] as! User
     }
     // etc...
     return cell
