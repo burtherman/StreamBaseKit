@@ -198,7 +198,7 @@ class MyViewController : UIViewController {
     stream = StreamBase(type: MyItem.self, ref: firebaseRef, ascending: false, limit: maxToFetch)
     transient = TransientStream()
     unionStream = UnionStream(sources: stream, transient)
-    unionStream.delegate = self  // Not using adapter since the delegate behavior is more complex.
+    unionStream.delegate = self
   }
 
   func fetchMoreTapped(sender: UIButton) {
