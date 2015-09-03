@@ -14,12 +14,10 @@ import UIKit
     objects, the underlying counter will remain accurate.  There are a few ways to make
     sure this works with closures.  Example usage:
 
-```
-var inflight : Inflight? = Inflight()
-doSomethingInBackground() {
-  inflight = nil
-}
-```
+        var inflight : Inflight? = Inflight()
+        doSomethingInBackground() {
+          inflight = nil
+        }
 */
 public class Inflight {
     
