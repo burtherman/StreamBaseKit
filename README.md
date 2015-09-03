@@ -28,14 +28,12 @@ Class  |  Description
 StreamBase | This is the main class that exposes a Firebase query as a Stream
 StreamBaseItem | Base class for objects that appear in streams
 StreamTableViewAdapter | Adapter from streams to UITableViews
-PartitionedStream | Stream for splitting a firebase queries across multiple sections in a table or collection
+PartitionedStream | Split a stream into multiple sections
 TransientStream |  Stream that's not connected to Firebase
 UnionStream |  Stream for merging multiple streams
 QueryBuilder | Helper for composing Firebase queries
 
 To get started, you'll need to build from StreamBaseItem and StreamBase.  Additionally, StreamTableViewAdapter provides some convenient functionality to connect streams with tables.  Here's the basic outline:
-
-### Swift
 
 ```swift
 
@@ -91,8 +89,6 @@ extension MyViewController : UITableViewDataSource {
 
 PartitionedStream allows you to define a partition function for splitting a stream into mulitple sections.  This is useful, eg, in splitting a roster of users into organizers and participants.  Building off of the previous example:
 
-### Swift
-
 ```swift
 
 User.swift
@@ -126,6 +122,10 @@ extension MyViewController : UITableViewDataSource {
     cell.titleLabel?.text = item.name 
     return cell
   }
+
+  func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    return pstream?.sectionTitles[section]
+  }
 }
 
 ```
@@ -133,8 +133,6 @@ extension MyViewController : UITableViewDataSource {
 ## Multiple Sections with Multiple Streams
 
 PartitionedStream is convenient to use, but if the underlying data has hundreds or more elements you'll need to provide limits per section.  You can do this by constructing multiple sections like this:
-
-### Swift
 
 ```swift
 
@@ -186,8 +184,6 @@ extension MyViewController : UITableViewDataSource {
 
 Chat histories can grow long, so it's important to enable them to be incrementally fetched.  To do this, we need to be able to insert temporary placeholders into the table to provide a ui for the fetch, and to actually perform the additional fetch.  There are further details (such as knowing the actual size of the stream!), but this is a rough sketch of how this would work:
 
-### Swift
-
 ```swift
 
 class MyViewController : UIViewController {
@@ -214,7 +210,7 @@ class MyViewController : UIViewController {
 }
 ```
 
-Here we extend the StreamBaseDelegate rathre than use the StreamTableViewAdapter because we need to manipulate state in the controller.
+Here we extend the StreamBaseDelegate rather than use the StreamTableViewAdapter because we need to manipulate state in the controller.
 
 ```swift
 extension MyViewController : StreamBaseDelegate {
