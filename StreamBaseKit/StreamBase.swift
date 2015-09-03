@@ -41,7 +41,6 @@ public class StreamBase : StreamBaseProtocol {
     private let queryPager: QueryPager!
     private let limit: Int?
     
-    private var observer: NSObjectProtocol?
     private var isBatching = false
     private var timer: NSTimer?
     private var isFetchingMore = false
@@ -185,9 +184,6 @@ public class StreamBase : StreamBaseProtocol {
     }
     
     deinit {
-        if let obs = self.observer {
-            NSNotificationCenter.defaultCenter().removeObserver(obs)
-        }
         for h in handles {
             query.removeObserverWithHandle(h)
         }
