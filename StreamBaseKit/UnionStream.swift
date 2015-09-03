@@ -19,7 +19,7 @@ import Foundation
     of the other streams is ignored.)
 */
 public class UnionStream {
-    private let sources: [StreamBase]  // TODO switch to StreamBaseProtocol
+    private let sources: [StreamBase]  // TODO StreamBaseProtocol
     private let delegates: [UnionStreamDelegate]
     private var timer: NSTimer?
     private var numStreamsFinished: Int? = 0
