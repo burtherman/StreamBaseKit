@@ -19,6 +19,9 @@ import Foundation
 public class PartitionedStream {
     public typealias Partitioner = StreamBaseItem -> Int
     
+    /**
+        The delegate to notify as the underying data changes.
+    */
     public weak var delegate: StreamBaseDelegate?
     
     /**
@@ -131,6 +134,8 @@ public class PartitionedStream {
     }
 }
 
+// MARK: SequenceType
+
 extension PartitionedStream : SequenceType {
     public var count: Int {
         return stream.count
@@ -145,6 +150,8 @@ extension PartitionedStream : SequenceType {
     }
 }
 
+// MARK: StreamBaseProtocol
+
 extension PartitionedStream : StreamBaseProtocol {
     public func find(key: String) -> StreamBaseItem? {
         return stream.find(key)
@@ -157,6 +164,8 @@ extension PartitionedStream : StreamBaseProtocol {
         return nil
     }
 }
+
+// MARK: StreamBaseDelegate
 
 extension PartitionedStream : StreamBaseDelegate {
     public func streamWillChange() {

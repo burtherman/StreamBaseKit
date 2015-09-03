@@ -9,30 +9,16 @@
 import Firebase
 
 /**
-    Common interface among several stream-like things including StreamBase, UnionStream,
-    TransientStream, and PartitionedStream.
-
-    NOTE: This protocol is under-used because what I think are Swift 1.2 limitations.  For
-    example, if this protocol extends SequenceType (as it should), then it can not be
-    used as the type of an instance variable.
-*/
-public protocol StreamBaseProtocol: class {
-    var delegate: StreamBaseDelegate? { get set }
-
-    func find(key: String) -> StreamBaseItem?
-    func findIndexPath(key: String) -> NSIndexPath?
-}
-
-/**
-    Surfaces a Firebase collection as a stream suitable for presenting in a table or collection.
+    Surfaces a Firebase collection as a stream suitable for presenting in a ui table or 
+    collection.
+    
     In addition to basic functionality of keeping stream synched with Firebase backing store
     and invoking a delegate with updates, it has some more advanced features:
     
-    * Inverted streams - key for correct scrolling behavior in messaging apps.
-    * Paging - key for scalability.
-    * Predicates - for client-side filtering of result sets, including data not necessarily 
-        persisted in Firebase.
-    * Batching - invokes delegate methods only after a batch of changes have occurred.
+    * Inverted streams
+    * Paging
+    * Predicates
+    * Batching
 */
 public class StreamBase : StreamBaseProtocol {
     public typealias Predicate = StreamBaseItem -> Bool
@@ -55,16 +41,16 @@ public class StreamBase : StreamBaseProtocol {
     private let queryPager: QueryPager!
     private let limit: Int?
     
-    /**
-        The comparator function used for sorting items.
-    */
-    public let comparator: Comparator
-    
     private var observer: NSObjectProtocol?
     private var isBatching = false
     private var timer: NSTimer?
     private var isFetchingMore = false
     private var shouldTellDelegateInitialLoadIsDone: Bool? = false
+    
+    /**
+        The comparator function used for sorting items.
+    */
+    public let comparator: Comparator
     
     /**
         How long to wait for a batch of changes to accumulate before invoking delegate.
@@ -468,6 +454,8 @@ public class StreamBase : StreamBaseProtocol {
         return NSIndexPath(forRow: row, inSection: 0)
     }
 }
+
+// MARK: SequenceType
 
 extension StreamBase : SequenceType {
     public var count: Int {

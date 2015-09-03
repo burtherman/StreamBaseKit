@@ -11,8 +11,8 @@ import Foundation
 /**
     Compose a stream out of other streams.  Some example use cases are:
 
-    * Placeholders for displaying a "fetch more" control, and "new since last visit".
-    * Mixing two queries - eg for high priority content and recent content - into same view.
+    - Placeholders
+    - Multiple Firebase queries in one view
 
     It's ok for the keys to overlap, and for different substreams to have different
     types.  The sort order of the first stream is used by the union stream.  (The sort orders 
@@ -24,18 +24,22 @@ public class UnionStream {
     private var timer: NSTimer?
     private var numStreamsFinished: Int? = 0
     private var union = KeyedArray<StreamBaseItem>()
-    private var error: NSError?
-    weak public var delegate: StreamBaseDelegate?
-    
+    private var error: NSError?    
     private var comparator: StreamBase.Comparator {
         get {
             return sources[0].comparator
         }
     }
+    
+    /**
+        The delegate to notify as the merged stream is updated.
+    */
+    weak public var delegate: StreamBaseDelegate?
 
     /**
         Construct a union stream from other streams.  The sort order of the first substream
         is used for the union.
+    
         :param: sources The substreams.
     */
     public init(sources: StreamBase...) {
