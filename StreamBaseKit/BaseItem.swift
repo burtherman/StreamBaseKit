@@ -9,14 +9,34 @@
 import Firebase
 
 /**
+    Protocol describing behavior of BaseItem.  This is useful for creating other
+    protocols that extend the behavior of BaseItem subclasses.
+*/
+public protocol BaseItemProtocol : KeyedObject {
+    var key: String? { get set }
+    var dict: [String: AnyObject] { get }
+    init(key: String?)
+    func update(dict: [String: AnyObject]?)
+    func clone() -> BaseItemProtocol
+}
+
+/**
     A base class for objects persisted in Firebase that make up the
     items in streams.
  */
-public class BaseItem: Equatable, KeyedObject {
+public class BaseItem: Equatable, BaseItemProtocol {
     /**
         The final part of the firebase path.
     */
     public var key: String?
+    
+    /**
+        Used for persisting data to firebase.  Subclasses should override,
+        appending their fields to this dictionary.
+    */
+    public var dict: [String: AnyObject] {
+        return [:]
+    }
     
     /**
         Create an empty instance.  Typically used for constructing new instances
@@ -38,15 +58,6 @@ public class BaseItem: Equatable, KeyedObject {
     }
     
     /**
-        Produce a shallow copy of this object.
-    */
-    public func clone() -> BaseItem {
-        let copy = self.dynamicType(key: key)
-        copy.update(dict)
-        return copy
-    }
-    
-    /**
         Subclasses should override to initialize fields.  If the dict is nil, then
         the object has been deleted.
     
@@ -56,11 +67,12 @@ public class BaseItem: Equatable, KeyedObject {
     }
     
     /**
-        Used for persisting data to firebase.  Subclasses should override,
-        appending their fields to this dictionary.
+        Produce a shallow copy of this object.
     */
-    public var dict: [String: AnyObject] {
-        return [:]
+    public func clone() -> BaseItemProtocol {
+        let copy = self.dynamicType(key: key)
+        copy.update(dict)
+        return copy
     }
 }
 
