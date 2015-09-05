@@ -22,7 +22,7 @@ public class TransientStream : StreamBase {
         
         :param: items   The items to appear in the stream.
     */
-    public func reset(items: [StreamBaseItem]?) {
+    public func reset(items: [BaseItem]?) {
         batching { a in
             a.reset(items ?? [])
         }
@@ -33,7 +33,7 @@ public class TransientStream : StreamBase {
 
         :param: items   The items to add.
     */
-    public func add(items: StreamBaseItem...) {
+    public func add(items: BaseItem...) {
         batching { a in
             a.extend(items)
         }
@@ -44,7 +44,7 @@ public class TransientStream : StreamBase {
 
         :param: items   The items to remove.
     */
-    public func remove(items: StreamBaseItem...) {
+    public func remove(items: BaseItem...) {
         batching { a in
             for p in items {
                 if let i = a.find(p.key!) {

@@ -23,7 +23,7 @@ public class UnionStream {
     private let delegates: [UnionStreamDelegate]
     private var timer: NSTimer?
     private var numStreamsFinished: Int? = 0
-    private var union = KeyedArray<StreamBaseItem>()
+    private var union = KeyedArray<BaseItem>()
     private var error: NSError?    
     private var comparator: StreamBase.Comparator {
         get {
@@ -53,7 +53,7 @@ public class UnionStream {
     }
     
     private func update() {
-        var newUnion = [StreamBaseItem]()
+        var newUnion = [BaseItem]()
         var seen = Set<String>()
         for source in sources {
             for item in source {
@@ -89,7 +89,7 @@ public class UnionStream {
         needsUpdate()
     }
     
-    func changed(t: StreamBaseItem) {
+    func changed(t: BaseItem) {
         if let row = union.find(t.key!) {
             delegate?.streamItemsChanged([NSIndexPath(forRow: row, inSection: 0)])
         }
@@ -102,17 +102,17 @@ extension UnionStream : SequenceType {
         return union.count
     }
     
-    public subscript(i: Int) -> StreamBaseItem {
+    public subscript(i: Int) -> BaseItem {
         return union[i]
     }
     
-    public func generate() -> GeneratorOf<StreamBaseItem> {
+    public func generate() -> GeneratorOf<BaseItem> {
         return union.generate()
     }
 }
 
 extension UnionStream : StreamBaseProtocol {
-    public func find(key: String) -> StreamBaseItem? {
+    public func find(key: String) -> BaseItem? {
         if let row = union.find(key) {
             return union[row]
         }

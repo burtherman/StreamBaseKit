@@ -21,8 +21,8 @@ import Firebase
     * Batching
 */
 public class StreamBase : StreamBaseProtocol {
-    public typealias Predicate = StreamBaseItem -> Bool
-    public typealias Comparator = (StreamBaseItem, StreamBaseItem) -> Bool
+    public typealias Predicate = BaseItem -> Bool
+    public typealias Comparator = (BaseItem, BaseItem) -> Bool
     public typealias QueryPager = (start: AnyObject?, end: AnyObject?, limit: Int?) -> FQuery
 
     public enum Ordering {
@@ -32,11 +32,11 @@ public class StreamBase : StreamBaseProtocol {
     }
     
     private var handles = [UInt]()
-    private var arrayBeforePredicate = KeyedArray<StreamBaseItem>()
-    private var array = KeyedArray<StreamBaseItem>()
-    private var batchArray = KeyedArray<StreamBaseItem>()
+    private var arrayBeforePredicate = KeyedArray<BaseItem>()
+    private var array = KeyedArray<BaseItem>()
+    private var batchArray = KeyedArray<BaseItem>()
     
-    private let type: StreamBaseItem.Type!
+    private let type: BaseItem.Type!
     private let query: FQuery!
     private let queryPager: QueryPager!
     private let limit: Int?
@@ -116,7 +116,7 @@ public class StreamBase : StreamBaseProtocol {
         :param: ascending   Whether to materialize the underlying array in ascending or descending order.
         :param: ordering    The ordering to use.
     */
-    public convenience init(type: StreamBaseItem.Type, ref: Firebase, limit: Int? = nil, ascending: Bool = true, ordering: Ordering = .Key) {
+    public convenience init(type: BaseItem.Type, ref: Firebase, limit: Int? = nil, ascending: Bool = true, ordering: Ordering = .Key) {
         let queryBuilder = QueryBuilder(ref: ref)
         queryBuilder.limit = limit
         queryBuilder.ascending = ascending
@@ -130,7 +130,7 @@ public class StreamBase : StreamBaseProtocol {
         :param: type    The type of items in the stream.
         :param: queryBuilder    The details of what firebase data to query.
     */
-    public init(type: StreamBaseItem.Type, queryBuilder: QueryBuilder) {
+    public init(type: BaseItem.Type, queryBuilder: QueryBuilder) {
         self.type = type
         
         limit = queryBuilder.limit
@@ -140,7 +140,8 @@ public class StreamBase : StreamBaseProtocol {
         
         handles.append(query.observeEventType(.ChildAdded, withBlock: { [weak self] snapshot in
             if let s = self {
-                var item = s.type(key: snapshot.key, ref: snapshot.ref, dict: snapshot.value as? [String: AnyObject])
+                var item = s.type(key: snapshot.key)
+                item.update(snapshot.value as? [String: AnyObject])
                 s.arrayBeforePredicate.append(item)
                 if s.predicate == nil || s.predicate!(item) {
                     s.batching { $0.append(item) }
@@ -165,7 +166,7 @@ public class StreamBase : StreamBaseProtocol {
             if let s = self {
                 if let row = s.arrayBeforePredicate.find(snapshot.key) {
                     let t = s.arrayBeforePredicate[row]
-                    t.update(snapshot.value as! [String: AnyObject])
+                    t.update(snapshot.value as? [String: AnyObject])
                     s.handleItemChanged(t)
                 }
             }
@@ -195,7 +196,7 @@ public class StreamBase : StreamBaseProtocol {
         :param: key The key to check
         :returns:    The item or nil if not found.
     */
-    public func find(key: String) -> StreamBaseItem? {
+    public func find(key: String) -> BaseItem? {
         if let row = array.find(key) {
             return array[row]
         }
@@ -222,7 +223,7 @@ public class StreamBase : StreamBaseProtocol {
         :param: item    The exemplar item.
         :returns:   The index path of that first item or nil if none is found.
     */
-    public func findFirstIndexPathAfter(item: StreamBaseItem) -> NSIndexPath? {
+    public func findFirstIndexPathAfter(item: BaseItem) -> NSIndexPath? {
         let a = array.rawArray
         if a.isEmpty {
             return nil
@@ -255,7 +256,7 @@ public class StreamBase : StreamBaseProtocol {
         :param: item    The exemplar item.
         :returns:   The index path of that first item or nil if none is found.
     */
-    public func findLastIndexPathBefore(item: StreamBaseItem) -> NSIndexPath? {
+    public func findLastIndexPathBefore(item: BaseItem) -> NSIndexPath? {
         let a = array.rawArray
         if a.isEmpty {
             return nil
@@ -305,10 +306,11 @@ public class StreamBase : StreamBaseProtocol {
                 if let result = snapshot.value as? [String: [String: AnyObject]] {
                     for (key, dict) in result {
                         if self.arrayBeforePredicate.find(key) == nil {
-                            var t = self.type(key: key, ref: snapshot.ref.childByAppendingPath(key), dict: dict)
-                            self.arrayBeforePredicate.append(t)
-                            if self.predicate == nil || self.predicate!(t) {
-                                a.append(t)
+                            var item = self.type(key: key)
+                            item.update(dict)
+                            self.arrayBeforePredicate.append(item)
+                            if self.predicate == nil || self.predicate!(item) {
+                                a.append(item)
                             }
                         }
                     }
@@ -324,7 +326,7 @@ public class StreamBase : StreamBaseProtocol {
 
         :param: item    The item that changed.
     */
-    public func handleItemChanged(item: StreamBaseItem) {
+    public func handleItemChanged(item: BaseItem) {
         if item.key == nil || !arrayBeforePredicate.has(item.key!) {
             return
         }
@@ -367,7 +369,7 @@ public class StreamBase : StreamBaseProtocol {
 
         :param: fn  The function the client provides to manipulate the array.
     */
-    func batching(fn: KeyedArray<StreamBaseItem> -> Void) {
+    func batching(fn: KeyedArray<BaseItem> -> Void) {
         if !isBatching {
             batchArray.reset(array)
         }
@@ -403,7 +405,7 @@ public class StreamBase : StreamBaseProtocol {
     }
     
     // NOTE: Expects both arrays to be sorted.
-    class func applyBatch(current: KeyedArray<StreamBaseItem>, batch: [StreamBaseItem], delegate: StreamBaseDelegate?, limit: Int? = nil) {
+    class func applyBatch(current: KeyedArray<BaseItem>, batch: [BaseItem], delegate: StreamBaseDelegate?, limit: Int? = nil) {
         var limitedBatch = batch
         if let l = limit where batch.count > l {
             limitedBatch = Array(limitedBatch[0..<l])
@@ -428,7 +430,7 @@ public class StreamBase : StreamBaseProtocol {
         Given *sorted* arrays <from> and <to>, produce the deletes (indexed in from)
         and adds (indexed in to) that are required to transform <from> to <to>.
     */
-    private class func diffFrom(from: [StreamBaseItem], to: [StreamBaseItem]) -> ([Int], [Int]) {
+    private class func diffFrom(from: [BaseItem], to: [BaseItem]) -> ([Int], [Int]) {
         var deletes = [Int]()
         var adds = [Int]()
         var fromKeys = Set<String>(from.map{$0.key!})
@@ -458,11 +460,11 @@ extension StreamBase : SequenceType {
         return array.count
     }
     
-    public subscript(i: Int) -> StreamBaseItem {
+    public subscript(i: Int) -> BaseItem {
         return array[i]
     }
     
-    public func generate() -> GeneratorOf<StreamBaseItem> {
+    public func generate() -> GeneratorOf<BaseItem> {
         return array.generate()
     }
 }

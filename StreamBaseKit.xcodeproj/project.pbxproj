@@ -15,7 +15,7 @@
 		E78988DC1B9563D20049A942 /* KeyedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78988D71B9563D20049A942 /* KeyedArray.swift */; };
 		E78988DD1B9563D20049A942 /* NSTimer+Closure.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78988D81B9563D20049A942 /* NSTimer+Closure.swift */; };
 		E78988DE1B9563D20049A942 /* StreamBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78988D91B9563D20049A942 /* StreamBase.swift */; };
-		E78988DF1B9563D20049A942 /* StreamBaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78988DA1B9563D20049A942 /* StreamBaseItem.swift */; };
+		E78988DF1B9563D20049A942 /* BaseItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78988DA1B9563D20049A942 /* BaseItem.swift */; };
 		E78989221B96647C0049A942 /* StreamBaseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E78988BA1B95634C0049A942 /* StreamBaseKit.framework */; };
 		E78989291B9664EC0049A942 /* Fakebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78988E71B95747A0049A942 /* Fakebase.swift */; };
 		E789892A1B9664F30049A942 /* PartitionedStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78988E91B9574820049A942 /* PartitionedStreamTests.swift */; };
@@ -46,10 +46,10 @@
 		E74D47C51B9684180053C937 /* StreamTableViewAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamTableViewAdapter.swift; sourceTree = "<group>"; };
 		E78988BA1B95634C0049A942 /* StreamBaseKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StreamBaseKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E78988D61B9563D20049A942 /* Inflight.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Inflight.swift; sourceTree = "<group>"; };
-		E78988D71B9563D20049A942 /* KeyedArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = KeyedArray.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		E78988D71B9563D20049A942 /* KeyedArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = KeyedArray.swift; sourceTree = "<group>"; };
 		E78988D81B9563D20049A942 /* NSTimer+Closure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSTimer+Closure.swift"; sourceTree = "<group>"; };
 		E78988D91B9563D20049A942 /* StreamBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = StreamBase.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		E78988DA1B9563D20049A942 /* StreamBaseItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamBaseItem.swift; sourceTree = "<group>"; };
+		E78988DA1B9563D20049A942 /* BaseItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseItem.swift; sourceTree = "<group>"; };
 		E78988E71B95747A0049A942 /* Fakebase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fakebase.swift; sourceTree = "<group>"; };
 		E78988E91B9574820049A942 /* PartitionedStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PartitionedStreamTests.swift; sourceTree = "<group>"; };
 		E78988EB1B9574890049A942 /* StreamBaseTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamBaseTests.swift; sourceTree = "<group>"; };
@@ -118,7 +118,7 @@
 				E716BBE71B97A18000944296 /* QueryBuilder.swift */,
 				E78988D91B9563D20049A942 /* StreamBase.swift */,
 				E7A021E91B98DBC400D9C3AB /* StreamBaseDelegate.swift */,
-				E78988DA1B9563D20049A942 /* StreamBaseItem.swift */,
+				E78988DA1B9563D20049A942 /* BaseItem.swift */,
 				E7A021EB1B98E19000D9C3AB /* StreamBaseProtocol.swift */,
 				E74D47C51B9684180053C937 /* StreamTableViewAdapter.swift */,
 				E7A021E71B98C1E400D9C3AB /* TransientStream.swift */,
@@ -314,7 +314,7 @@
 				E7A021EC1B98E19000D9C3AB /* StreamBaseProtocol.swift in Sources */,
 				E78989321B966A610049A942 /* UnionStream.swift in Sources */,
 				E78988DE1B9563D20049A942 /* StreamBase.swift in Sources */,
-				E78988DF1B9563D20049A942 /* StreamBaseItem.swift in Sources */,
+				E78988DF1B9563D20049A942 /* BaseItem.swift in Sources */,
 				E716BBE91B97A19900944296 /* QueryBuilder.swift in Sources */,
 				E78988DB1B9563D20049A942 /* Inflight.swift in Sources */,
 				E7A021EA1B98DBC400D9C3AB /* StreamBaseDelegate.swift in Sources */,

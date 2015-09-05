@@ -17,7 +17,7 @@ import Foundation
     different sections (details in StreamTableViewAdapter).
 */
 public class PartitionedStream {
-    public typealias Partitioner = StreamBaseItem -> Int
+    public typealias Partitioner = BaseItem -> Int
     
     /**
         The delegate to notify as the underying data changes.
@@ -35,7 +35,7 @@ public class PartitionedStream {
     public let sectionTitles : [String]
     
     private let stream : StreamBase
-    private var sections = [[StreamBaseItem]]()
+    private var sections = [[BaseItem]]()
     private let partitioner : Partitioner
     
     /**
@@ -65,7 +65,7 @@ public class PartitionedStream {
         Index the partitioned stream directly by index path.
         :param: index   The index.
     */
-    public subscript(index: NSIndexPath) -> StreamBaseItem {
+    public subscript(index: NSIndexPath) -> BaseItem {
         return sections[index.section][index.row]
     }
 
@@ -74,7 +74,7 @@ public class PartitionedStream {
         :param: section The section.
         :param: row The row.
     */
-    public subscript(section: Int, row: Int) -> StreamBaseItem {
+    public subscript(section: Int, row: Int) -> BaseItem {
         return sections[section][row]
     }
     
@@ -82,11 +82,11 @@ public class PartitionedStream {
         Retrieve the underlying array of items in a given section.
         :param: section The section.
     */
-    public subscript(section: Int) -> [StreamBaseItem] {
+    public subscript(section: Int) -> [BaseItem] {
         return sections[section]
     }
     
-    private func add(section: Int, obj: StreamBaseItem, streamIndex: Int, inout addedPaths: [NSIndexPath]) {
+    private func add(section: Int, obj: BaseItem, streamIndex: Int, inout addedPaths: [NSIndexPath]) {
         if sections[section].count == 0 || stream.comparator(sections[section].last!, obj) {
             // append
             addedPaths.append(NSIndexPath(forRow: sections[section].count, inSection: section))
@@ -141,11 +141,11 @@ extension PartitionedStream : SequenceType {
         return stream.count
     }
     
-    public subscript(i: Int) -> StreamBaseItem {
+    public subscript(i: Int) -> BaseItem {
         return stream[i]
     }
     
-    public func generate() -> GeneratorOf<StreamBaseItem> {
+    public func generate() -> GeneratorOf<BaseItem> {
         return stream.generate()
     }
 }
@@ -153,7 +153,7 @@ extension PartitionedStream : SequenceType {
 // MARK: StreamBaseProtocol
 
 extension PartitionedStream : StreamBaseProtocol {
-    public func find(key: String) -> StreamBaseItem? {
+    public func find(key: String) -> BaseItem? {
         return stream.find(key)
     }
     

@@ -28,7 +28,7 @@ public protocol StreamBaseProtocol: class {
         :param: key The key to look up.
         :returns:   The item matching the key.
     */
-    func find(key: String) -> StreamBaseItem?
+    func find(key: String) -> BaseItem?
     
     /**
         Find the path of the item with the given key.

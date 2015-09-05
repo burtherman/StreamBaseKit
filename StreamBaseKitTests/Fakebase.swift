@@ -13,7 +13,7 @@ func paths(paths: (Int, Int)...) -> [NSIndexPath] {
     return paths.map { NSIndexPath(forRow: $0.1, inSection: $0.0) }
 }
 
-class TestItem : StreamBaseItem {
+class TestItem : BaseItem {
     static let a = TestItem(key: "a")
     static let b = TestItem(key: "b")
     static let c = TestItem(key: "c")
@@ -33,12 +33,12 @@ class TestItem : StreamBaseItem {
         return d
     }
     
-    override func update(dict: [String: AnyObject]) {
+    override func update(dict: [String: AnyObject]?) {
         super.update(dict)
-        bool = dict["bool"] as? Bool
-        int = dict["int"] as? Int
-        float = dict["float"] as? Float
-        string = dict["string"] as? String
+        bool = dict?["bool"] as? Bool
+        int = dict?["int"] as? Int
+        float = dict?["float"] as? Float
+        string = dict?["string"] as? String
     }
 }
 
