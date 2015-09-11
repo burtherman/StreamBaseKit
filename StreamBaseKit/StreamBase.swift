@@ -423,10 +423,10 @@ public class StreamBase : StreamBaseProtocol {
         Given two sorted arrays - the current and next(batch) versions - compute the changes
         and invoke the delegate with any updates.
 
-        :param: current The current state before applying the batch (must be sorted).
-        :param: batch   The new state (must be sorted).
+        :param: current The existing array before applying the batch.  Must be sorted.
+        :param: batch   The new array after applying batch.  Must be sorted.
         :param: delegate    The delegate to notify of differences.
-        :param: limit   A limit that is applied after the predicate is evaluated.
+        :param: limit   A limit that is applied to the batch.  NOTE: this is after the predicate is evaluated.
     */
     class func applyBatch(current: KeyedArray<BaseItem>, batch: [BaseItem], delegate: StreamBaseDelegate?, limit: Int? = nil) {
         var limitedBatch = batch
@@ -453,14 +453,17 @@ public class StreamBase : StreamBaseProtocol {
         Given sorted arrays <from> and <to>, produce the deletes (indexed in from)
         and adds (indexed in to) that are required to transform <from> to <to>.
     
-        :param: from    The source array for computing differences.
-        :param: to  The target array for computing differences.
+        :param: from    The source array for computing differences.  Must be sorted.
+        :param: to  The target array for computing differences.  Must be sorted.
+    
+        :returns: A tuple of two arrays.  The first is the indices of the deletes 
+        in the from array.  The second is the indices of the adds in the to array.
     */
     private class func diffFrom(from: [BaseItem], to: [BaseItem]) -> ([Int], [Int]) {
         var deletes = [Int]()
         var adds = [Int]()
-        var fromKeys = Set<String>(from.map{$0.key!})
-        let toKeys = Set<String>(to.map{$0.key!})
+        var fromKeys = Set(from.map{ $0.key! })
+        let toKeys = Set(to.map{ $0.key! })
         for (i, item) in enumerate(from) {
             if !toKeys.contains(item.key!) {
                 deletes.append(i)
