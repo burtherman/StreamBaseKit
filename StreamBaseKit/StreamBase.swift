@@ -419,7 +419,15 @@ public class StreamBase : StreamBaseProtocol {
         }
     }
     
-    // NOTE: Expects both arrays to be sorted.
+    /**
+        Given two sorted arrays - the current and next(batch) versions - compute the changes
+        and invoke the delegate with any updates.
+
+        :param: current The current state before applying the batch (must be sorted).
+        :param: batch   The new state (must be sorted).
+        :param: delegate    The delegate to notify of differences.
+        :param: limit   A limit that is applied after the predicate is evaluated.
+    */
     class func applyBatch(current: KeyedArray<BaseItem>, batch: [BaseItem], delegate: StreamBaseDelegate?, limit: Int? = nil) {
         var limitedBatch = batch
         if let l = limit where batch.count > l {
@@ -442,8 +450,11 @@ public class StreamBase : StreamBaseProtocol {
     }
     
     /**
-        Given *sorted* arrays <from> and <to>, produce the deletes (indexed in from)
+        Given sorted arrays <from> and <to>, produce the deletes (indexed in from)
         and adds (indexed in to) that are required to transform <from> to <to>.
+    
+        :param: from    The source array for computing differences.
+        :param: to  The target array for computing differences.
     */
     private class func diffFrom(from: [BaseItem], to: [BaseItem]) -> ([Int], [Int]) {
         var deletes = [Int]()
@@ -463,7 +474,7 @@ public class StreamBase : StreamBaseProtocol {
         return (deletes, adds)
     }
     
-    private func pathAt(row: Int) -> NSIndexPath {
+    private final func pathAt(row: Int) -> NSIndexPath {
         return NSIndexPath(forRow: row, inSection: 0)
     }
 }
