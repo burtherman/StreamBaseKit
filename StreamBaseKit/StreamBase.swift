@@ -142,6 +142,7 @@ public class StreamBase : StreamBaseProtocol {
             if let s = self {
                 var item = s.type(key: snapshot.key)
                 item.update(snapshot.value as? [String: AnyObject])
+                s.didConstructItem(item)
                 s.arrayBeforePredicate.append(item)
                 if s.predicate == nil || s.predicate!(item) {
                     s.batching { $0.append(item) }
@@ -191,9 +192,18 @@ public class StreamBase : StreamBaseProtocol {
     }
     
     /**
+        Hook for additional initialization after an item in the stream is created.
+    
+        :param: item    The item that was just constructed.
+    */
+    public func didConstructItem(item: BaseItem) {
+    }
+    
+    /**
         Find the item for a given key.
     
         :param: key The key to check
+    
         :returns:    The item or nil if not found.
     */
     public func find(key: String) -> BaseItem? {
@@ -207,6 +217,7 @@ public class StreamBase : StreamBaseProtocol {
         Find the index path for the given key.
 
         :param: key The key to check.
+    
         :returns:    The index path or nil if not found.
     */
     public func findIndexPath(key: String) -> NSIndexPath? {
@@ -221,6 +232,7 @@ public class StreamBase : StreamBaseProtocol {
         exemplar item.  The exemplar item need not be in this stream.
     
         :param: item    The exemplar item.
+    
         :returns:   The index path of that first item or nil if none is found.
     */
     public func findFirstIndexPathAfter(item: BaseItem) -> NSIndexPath? {
@@ -254,6 +266,7 @@ public class StreamBase : StreamBaseProtocol {
         exemplar item.  The exemplar item need not be in this stream.
         
         :param: item    The exemplar item.
+    
         :returns:   The index path of that first item or nil if none is found.
     */
     public func findLastIndexPathBefore(item: BaseItem) -> NSIndexPath? {
@@ -308,6 +321,7 @@ public class StreamBase : StreamBaseProtocol {
                         if self.arrayBeforePredicate.find(key) == nil {
                             var item = self.type(key: key)
                             item.update(dict)
+                            self.didConstructItem(item)
                             self.arrayBeforePredicate.append(item)
                             if self.predicate == nil || self.predicate!(item) {
                                 a.append(item)
@@ -322,9 +336,10 @@ public class StreamBase : StreamBaseProtocol {
     
     /**
         Called to notify the stream that an item in it has changed which may affect the predicate
-        or sort order.
+        or sort order.  If you have local properties on items that affect streams, consider
+        adding a listener in your StreamBase subclass that invokes this method.
 
-        :param: item    The item that changed.
+        :param: item    The item that changed.  Ignores items that are not part of the stream.
     */
     public func handleItemChanged(item: BaseItem) {
         if item.key == nil || !arrayBeforePredicate.has(item.key!) {
