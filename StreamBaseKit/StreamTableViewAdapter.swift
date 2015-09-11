@@ -58,7 +58,7 @@ public class StreamTableViewAdapter : StreamBaseDelegate {
     
     public func streamDidChange() {
         if isInitialLoad {
-            UIView.animateWithDuration(0) {
+            UIView.performWithoutAnimation {
                 self.tableView.endUpdates()
             }
         } else {
