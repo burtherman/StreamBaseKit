@@ -312,7 +312,7 @@ override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
 	// ...
 ```
 
-Now, when you call ```resourceContext.create(GroupMessage())``` it will know how to resolve the key "$group".  Similarly, if you went deeper and could like messages in groups, you could do that by pushing yet another ResourceContext onto the stack.  That might look like:
+Now, when you call ```resourceContext.create(GroupMessage())``` in GroupViewController it will know how to resolve the key "$group".  Similarly, if you went deeper and could like messages in groups, you could do that by pushing yet another ResourceContext onto the stack transiently.  That might look like:
 
 ```swift
 func messageLikeTouched(sender: MessageLikeControl) {
