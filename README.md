@@ -259,7 +259,7 @@ You register resources with an the ResourceBase using the ResourceRegistry proto
 Environment.swift
 
 class Environment {
-  let sharedEnv: Environment = {
+  static let sharedEnv: Environment = {
     let env = Environment()
     env.firebase = Firebase(url: "https://<YOUR-FIREBASE-APP>.firebaseio.com")
     env.resourceBase = ResourceBase(firebase: firebase)
