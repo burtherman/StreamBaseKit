@@ -151,6 +151,7 @@ public class ResourceBase : Printable {
     var resources = [ResourceSpec]()
     var counters = [CounterSpec]()
     
+    /// An error handler.  Set this to be notified of errors communicating with Firebase.
     public var errorHandler: ResourceErrorHandler?
     
     /**
@@ -252,7 +253,6 @@ public class ResourceBase : Printable {
         :param: context The resource context.
         :param: done    Invoke this when ready to proceed with update.
     */
-    
     public func willDestroyInstance(instance: BaseItemProtocol, context: ResourceContext, done: ResourceDoneHandler) {
         done(error: nil)
     }
