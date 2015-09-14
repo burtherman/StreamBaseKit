@@ -261,7 +261,7 @@ Environment.swift
 class Environment {
   let sharedEnv: Environment = {
     let env = Environment()
-    env.firebase = Firebase(url: "https://YOUR-APP.firebaseio.com")
+    env.firebase = Firebase(url: "https://<YOUR-FIREBASE-APP>.firebaseio.com")
     env.resourceBase = ResourceBase(firebase: firebase)
 
     let registry: ResourceRegistry = env.resourceBase
@@ -328,9 +328,9 @@ It's also possible to specify counters which get incremented or decremented when
 registry.counter(Group.self, "message_count", GroupMessage.self)
 ```
 
-The ResourceBase will take care of incrementing and decrementing the "message_count" when messages are created and destroyed.  This counter will appear under "/group/<GROUP KEY>/message_count".  
+The ResourceBase will take care of incrementing and decrementing the "message_count" when messages are created and destroyed.  This counter will appear under "/group/$group_key/message_count".  
 
-Note that this counter is maintained client-side, and so can become inconsistent.
+Note that this counter is maintained client-side, and so can become inconsistent over time.  For example, it doesn't work when offline due to a Firebase limitation with transactions.
 
 ## Extending ResourceBase
 
