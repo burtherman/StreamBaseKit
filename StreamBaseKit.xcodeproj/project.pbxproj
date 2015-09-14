@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		19079AF4F38C0E9A1A128E21 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99B8FBDDB42E486A42011A20 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		E716BBE91B97A19900944296 /* QueryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E716BBE71B97A18000944296 /* QueryBuilder.swift */; };
+		E749F53A1BA73608006143D5 /* ResourceBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E749F5391BA73608006143D5 /* ResourceBase.swift */; };
+		E749F53C1BA73662006143D5 /* ResourceContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E749F53B1BA73662006143D5 /* ResourceContext.swift */; };
+		E749F53E1BA75638006143D5 /* ResourceContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E749F53D1BA75638006143D5 /* ResourceContextTests.swift */; };
 		E74D47C21B967E5C0053C937 /* KeyedArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74D47C11B967E5C0053C937 /* KeyedArrayTests.swift */; };
 		E74D47C61B9684180053C937 /* StreamTableViewAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74D47C51B9684180053C937 /* StreamTableViewAdapter.swift */; };
 		E78988DB1B9563D20049A942 /* Inflight.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78988D61B9563D20049A942 /* Inflight.swift */; };
@@ -42,6 +45,9 @@
 		45D5B206D1F5079EC6AAF50F /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		99B8FBDDB42E486A42011A20 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E716BBE71B97A18000944296 /* QueryBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QueryBuilder.swift; path = StreamBaseKit/QueryBuilder.swift; sourceTree = SOURCE_ROOT; };
+		E749F5391BA73608006143D5 /* ResourceBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceBase.swift; sourceTree = "<group>"; };
+		E749F53B1BA73662006143D5 /* ResourceContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceContext.swift; sourceTree = "<group>"; };
+		E749F53D1BA75638006143D5 /* ResourceContextTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceContextTests.swift; sourceTree = "<group>"; };
 		E74D47C11B967E5C0053C937 /* KeyedArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyedArrayTests.swift; sourceTree = "<group>"; };
 		E74D47C51B9684180053C937 /* StreamTableViewAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamTableViewAdapter.swift; sourceTree = "<group>"; };
 		E78988BA1B95634C0049A942 /* StreamBaseKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StreamBaseKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,12 +119,14 @@
 		E78988BC1B95634C0049A942 /* StreamBaseKit */ = {
 			isa = PBXGroup;
 			children = (
+				E78988DA1B9563D20049A942 /* BaseItem.swift */,
 				E78988D71B9563D20049A942 /* KeyedArray.swift */,
 				E789892D1B96675C0049A942 /* PartitionedStream.swift */,
 				E716BBE71B97A18000944296 /* QueryBuilder.swift */,
+				E749F5391BA73608006143D5 /* ResourceBase.swift */,
+				E749F53B1BA73662006143D5 /* ResourceContext.swift */,
 				E78988D91B9563D20049A942 /* StreamBase.swift */,
 				E7A021E91B98DBC400D9C3AB /* StreamBaseDelegate.swift */,
-				E78988DA1B9563D20049A942 /* BaseItem.swift */,
 				E7A021EB1B98E19000D9C3AB /* StreamBaseProtocol.swift */,
 				E74D47C51B9684180053C937 /* StreamTableViewAdapter.swift */,
 				E7A021E71B98C1E400D9C3AB /* TransientStream.swift */,
@@ -132,8 +140,9 @@
 			isa = PBXGroup;
 			children = (
 				E78988E71B95747A0049A942 /* Fakebase.swift */,
-				E78988E91B9574820049A942 /* PartitionedStreamTests.swift */,
 				E74D47C11B967E5C0053C937 /* KeyedArrayTests.swift */,
+				E78988E91B9574820049A942 /* PartitionedStreamTests.swift */,
+				E749F53D1BA75638006143D5 /* ResourceContextTests.swift */,
 				E78988EB1B9574890049A942 /* StreamBaseTests.swift */,
 				E789891E1B96647C0049A942 /* Supporting Files */,
 			);
@@ -310,10 +319,12 @@
 				E78988DD1B9563D20049A942 /* NSTimer+Closure.swift in Sources */,
 				E78988DC1B9563D20049A942 /* KeyedArray.swift in Sources */,
 				E7A021E81B98C1E400D9C3AB /* TransientStream.swift in Sources */,
+				E749F53C1BA73662006143D5 /* ResourceContext.swift in Sources */,
 				E74D47C61B9684180053C937 /* StreamTableViewAdapter.swift in Sources */,
 				E7A021EC1B98E19000D9C3AB /* StreamBaseProtocol.swift in Sources */,
 				E78989321B966A610049A942 /* UnionStream.swift in Sources */,
 				E78988DE1B9563D20049A942 /* StreamBase.swift in Sources */,
+				E749F53A1BA73608006143D5 /* ResourceBase.swift in Sources */,
 				E78988DF1B9563D20049A942 /* BaseItem.swift in Sources */,
 				E716BBE91B97A19900944296 /* QueryBuilder.swift in Sources */,
 				E78988DB1B9563D20049A942 /* Inflight.swift in Sources */,
@@ -330,6 +341,7 @@
 				E78989291B9664EC0049A942 /* Fakebase.swift in Sources */,
 				E789892A1B9664F30049A942 /* PartitionedStreamTests.swift in Sources */,
 				E789892B1B9664F60049A942 /* StreamBaseTests.swift in Sources */,
+				E749F53E1BA75638006143D5 /* ResourceContextTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
