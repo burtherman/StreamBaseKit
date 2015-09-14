@@ -1,6 +1,8 @@
 # StreamBaseKit - UI toolkit for Firebase
 
-StreamBaseKit is a Swift UI toolkit for [Firebase](https://www.firebase.com).  It surfaces Firebase queries as streams that are synched with Firebase in real time, fetched incrementally, and can be merged or split into multiple sections.  These streams can be easily plugged into UI elements like table views.
+StreamBaseKit is a Swift UI toolkit for [Firebase](https://www.firebase.com).  It surfaces Firebase queries as streams that are synched with Firebase in real time, fetched incrementally, and can be merged or split into multiple sections.  These streams can be easily plugged into UI elements like table views.  
+
+It also includes a persistence layer that makes it easy to persist objects in Firebase.
 
 ## Installing StreamBaseKit
 
@@ -33,6 +35,9 @@ PartitionedStream | Split a stream into multiple sections.
 TransientStream |  Stream that's not connected to Firebase.
 UnionStream |  Stream for merging multiple streams.
 QueryBuilder | Helper for composing Firebase queries.
+ResourceBase | Core of persistence layer.
+ResourceContext | Helper for managing context in persistence layer.
+ResourceRegistry | Protocol for registering resources.
 
 To get started, you'll need to build from StreamBaseItem and StreamBase.  Additionally, StreamTableViewAdapter provides some convenient functionality to connect streams with tables.  Here's the basic outline:
 
@@ -225,6 +230,106 @@ extension MyViewController : StreamBaseDelegate {
 }
 
 ```
+
+# Persistence Layer
+
+StreamBaseKit also includes a persistence layer that uses a declarative approach: you state where something is stored, and the layer takes care of doing so.  For example,
+
+```swift
+registry.resource(Group.self, "/group/@")
+registry.resource(GroupMessage.self, "/group_message/$group/@")
+```
+
+State to store groups in "/group", and messages, which are logically contained in groups, in "/group_message".  (Recall that it's not a good practice to store them under group, say in "/group/$group/message/@" because fetches of the group would also fetch all of the messages.)  
+
+The "@" means that an auto-id is generated for create operations, and the object's key is used for updates and destroys.  The "$" means that the value must be looked up using a ResourceContext... more on that below.
+
+
+## Registering Resources with Persistence Layer
+
+You register resources with an the ResourceBase using the ResourceRegistry protocol.  One approach is to put the ResourceBase in a singleton, and in the initializer of that singleton, register all of the resources from the model.  For example:
+
+```swift
+
+Environment.swift
+
+class Environment {
+  let sharedEnv: Environment = {
+    let env = Environment()
+    env.firebase = Firebase(url: "https://YOUR-APP.firebaseio.com")
+    env.resourceBase = ResourceBase(firebase: firebase)
+
+    let registry: ResourceRegistry = env.resourceBase
+    registry.resource(Group.self, "/group/@")
+    registry.resource(GroupMessage.self, "/group_message/$group/@")
+    // ...
+
+    return env
+  }()
+}
+
+```
+
+## Using the ResourceContext Stack
+
+In order for the initial view controller will have the root of the ResourceContext stack, you can create it using the Environment singleton like:
+
+```swift
+
+InitialViewController.swift
+
+class InitialViewController : UIViewController {
+  var rootResourceContext: ResourceContext!
+  // ...
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    rootResourceContext = ResourceContext(base: Environment.sharedEnv.resourceBase, resources: nil)
+    // ...
+```
+
+Now, this view controller can now create groups like this:
+
+
+```swift
+let group = Group()
+group.name = "group name"
+rootResourceContext.create(group)
+```
+
+Recall that the "$" indicates a context key which must be filled in in order to persist the object.  The ResourceContext is responsible for doing this.  Say you had a ```GroupViewController``` which allows users to message groups.  In your segue, before pushing this view controller onto your navigation controller, you'd do something like this:
+
+```swift
+override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    switch(segue.destinationViewController) {
+    case let groupVC as GroupTableViewController:
+        groupVC.resourceContext = resourceContext.push(["group": group])
+	// ...
+```
+
+Now, when you call ```resourceContext.create(GroupMessage())``` it will know how to resolve the key "$group".  Similarly, if you went deeper and could like messages in groups, you could do that by pushing yet another ResourceContext onto the stack.  That might look like:
+
+```swift
+func messageLikeTouched(sender: MessageLikeControl) {
+  resourceContext.push(["message": sender.message]).create(MessageLike())
+}
+```
+
+## Counters
+
+It's also possible to specify counters which get incremented or decremented when objects are created or destroyed.  Say you wanted to keep track of how many messages were in your group.  You'd register a counter like:
+
+```swift
+registry.counter(Group.self, "message_count", GroupMessage.self)
+```
+
+The ResourceBase will take care of incrementing and decrementing the "message_count" when messages are created and destroyed.  This counter will appear under "/group/<GROUP KEY>/message_count".  
+
+Note that this counter is maintained client-side, and so can become inconsistent.
+
+## Extending ResourceBase
+
+ResourceBase has a number of hooks for subclasses to use when extending it.  There are hooks for create, update and destroy that are invoked before, after commit to local storage, and after commit to remote storage.  There is also a hook for [logging so a server can handle side effects](https://medium.com/@spf2/action-logs-for-firebase-30a699200660).
 
 
 # Comparison with FirebaseUI-iOS
