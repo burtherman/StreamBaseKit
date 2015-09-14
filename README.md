@@ -237,7 +237,7 @@ registry.resource(Group.self, "/group/@")
 registry.resource(GroupMessage.self, "/group_message/$group/@")
 ```
 
-This states that groups are stored under "/group", and messages, which are logically contained in groups, under "/group_message".  (Recall that it's not a good practice to store them under group, say in "/group/$group/message/@" because fetches of the group would also fetch all of the messages.)  
+This states that groups are stored under "/group", and messages, which are logically contained in groups, under "/group_message".  (Recall that it's not a good practice to store them under "/group", say in "/group/$group/message/@", because fetches of the group would also fetch all of the messages.)  
 
 The "@" means that an auto-id is generated for create operations, and the object's key is used for updates and destroys.  The "$" means that the value must be looked up using a ResourceContext... more on that below.
 
