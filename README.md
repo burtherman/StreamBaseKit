@@ -2,7 +2,7 @@
 
 StreamBaseKit is a Swift UI toolkit for [Firebase](https://www.firebase.com).  It surfaces Firebase queries as streams that are synched with Firebase in real time, fetched incrementally, and can be merged or split into multiple sections.  These streams can be easily plugged into UI elements like table views.  
 
-This kit also includes a [persistence layer](#persistence layer) that makes it easy to persist objects in Firebase.
+This kit also includes a [persistence layer](#persistence-layer) that makes it easy to persist objects in Firebase.
 
 ## Installing StreamBaseKit
 
