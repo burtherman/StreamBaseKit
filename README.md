@@ -341,6 +341,6 @@ ResourceBase has a number of hooks for subclasses to use when extending it.  The
 
 An alternative library to consider is [FirebaseUI-iOS](https://github.com/firebase/FirebaseUI-iOS).  It is the official client library for Firebase.  It's written in Objective-C instead of Swift, and is simpler.
 
-StreamBaseKit grew out of a real world social application and addresses a variety of problems encountered in doing so.  For example, ios table views are designed for insertion on top, and Firebase appends new data.  To make these work well together for messaging-type apps, one needs to invert both the firebase collection and the table view.  StreamBaseKit also makes it easy to add more advanced functionality like splitting a collection into multiple table sections, and inserting transient content into the table like a "fetch more" control for incremental fetching.
+StreamBaseKit grew out of building Movem3nt, a complex social application, and addresses a variety of problems encountered in doing so.  For example, ios table views are designed for insertion on top, and Firebase appends new data.  To make these work well together for messaging-type apps, one needs to invert both the firebase collection and the table view.  StreamBaseKit also makes it easy to add more advanced functionality like splitting a collection into multiple table sections, and inserting transient content into the table like a "fetch more" control for incremental fetching.
 
 Another consideration is that Firebase also has a Android UI library. StreamBaseKit does not (yet).
