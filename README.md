@@ -2,7 +2,7 @@
 
 StreamBaseKit is a Swift UI toolkit for [Firebase](https://www.firebase.com).  It surfaces Firebase queries as streams that are synched with Firebase in real time, fetched incrementally, and can be merged or split into multiple sections.  These streams can be easily plugged into UI elements like table views.  
 
-It also includes a persistence layer that makes it easy to persist objects in Firebase.
+This kit also includes a [persistence layer](#Persistence Layer) that makes it easy to persist objects in Firebase.
 
 ## Installing StreamBaseKit
 
@@ -23,7 +23,7 @@ use_frameworks!
 
 If you don't have one already, sign up for a [Firebase account](https://www.firebase.com/signup/).
 
-To use StreamBaseKit, you'll want to know about these classes:
+To use streams, you'll want to know about these classes:
 
 Class  |  Description
 -------|-------------
@@ -35,9 +35,6 @@ PartitionedStream | Split a stream into multiple sections.
 TransientStream |  Stream that's not connected to Firebase.
 UnionStream |  Stream for merging multiple streams.
 QueryBuilder | Helper for composing Firebase queries.
-ResourceBase | Core of persistence layer.
-ResourceContext | Helper for managing context in persistence layer.
-ResourceRegistry | Protocol for registering resources.
 
 To get started, you'll need to build from StreamBaseItem and StreamBase.  Additionally, StreamTableViewAdapter provides some convenient functionality to connect streams with tables.  Here's the basic outline:
 
@@ -233,7 +230,7 @@ extension MyViewController : StreamBaseDelegate {
 
 # Persistence Layer
 
-StreamBaseKit also includes a persistence layer that uses a declarative approach: you state where something is stored, and the layer takes care of doing so.  For example,
+StreamBaseKit also includes a persistence layer that uses a declarative approach: you state where something is stored, and the layer takes care of the rest.  For example,
 
 ```swift
 registry.resource(Group.self, "/group/@")
@@ -244,10 +241,18 @@ State to store groups in "/group", and messages, which are logically contained i
 
 The "@" means that an auto-id is generated for create operations, and the object's key is used for updates and destroys.  The "$" means that the value must be looked up using a ResourceContext... more on that below.
 
+To use the persitence layer, you'll want to know about these classes:
+
+Class  |  Description
+-------|-------------
+ResourceBase | Core of persistence layer.
+ResourceContext | Helper for managing context in persistence layer.
+ResourceRegistry | Protocol for registering resources.
+
 
 ## Registering Resources with Persistence Layer
 
-You register resources with an the ResourceBase using the ResourceRegistry protocol.  One approach is to put the ResourceBase in a singleton, and in the initializer of that singleton, register all of the resources from the model.  For example:
+You register resources with an the ResourceBase using the ResourceRegistry protocol.  One approach is to put the ResourceBase in a singleton.  For example:
 
 ```swift
 
@@ -272,7 +277,7 @@ class Environment {
 
 ## Using the ResourceContext Stack
 
-In order for the initial view controller will have the root of the ResourceContext stack, you can create it using the Environment singleton like:
+In the initial view controller, use the Environment singleton to create the root resource context:
 
 ```swift
 
@@ -288,7 +293,7 @@ class InitialViewController : UIViewController {
     // ...
 ```
 
-Now, this view controller can now create groups like this:
+Now, this view controller can now create, update or delete Groups using the root resource context.  For example:
 
 
 ```swift
@@ -297,13 +302,13 @@ group.name = "group name"
 rootResourceContext.create(group)
 ```
 
-Recall that the "$" indicates a context key which must be filled in in order to persist the object.  The ResourceContext is responsible for doing this.  Say you had a ```GroupViewController``` which allows users to message groups.  In your segue, before pushing this view controller onto your navigation controller, you'd do something like this:
+Recall that the "$" indicates a context key which must be filled in in order to persist the object.  The ResourceContext is responsible for doing this.  Say you had a GroupViewController which allows users to message groups.  In your initial view controller, before pushing the group view controller onto your navigation controller, you'd do something like this:
 
 ```swift
 override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     switch(segue.destinationViewController) {
     case let groupVC as GroupTableViewController:
-        groupVC.resourceContext = resourceContext.push(["group": group])
+        groupVC.resourceContext = resourceContext.push(["group": sender as! Group])
 	// ...
 ```
 
