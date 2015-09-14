@@ -146,7 +146,8 @@ public class ResourceBase : Printable {
         }
     }
     
-    let firebase: Firebase
+    /// The underlying firebase instance for this base.
+    public let firebase: Firebase
     var resources = [ResourceSpec]()
     var counters = [CounterSpec]()
     
@@ -302,7 +303,14 @@ public class ResourceBase : Printable {
     public func logAction(path: String, old: FDataSnapshot?, new: BaseItemProtocol?, extraContext: ResourceDict) {
     }
     
-    class func splitPath(path: String) -> [String] {
+    /**
+        Helper for splitting a path into components like "/a/b/c" -> ["a", "b", "c"].  Leading "/" ignored.
+
+        :param: path    The path to split.
+
+        :returns:   An array of path components.
+    */
+    public class func splitPath(path: String) -> [String] {
         var p = path
         while p.hasPrefix("/") {
             p = dropFirst(p)
