@@ -356,10 +356,7 @@ public class ResourceBase : Printable {
         })
     }
     
-    func findResourcePath(type: BaseItemProtocol.Type, context: ResourceContext?) -> String? {
-        if let path = context?.fullPath {
-            return path
-        }
+    public func findResourcePath(type: BaseItemProtocol.Type, context: ResourceContext?) -> String? {
         return resources.filter({ $0.type.self === type }).first?.path
     }
     

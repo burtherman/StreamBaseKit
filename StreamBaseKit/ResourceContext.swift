@@ -44,7 +44,6 @@ import Firebase
 public class ResourceContext : DebugPrintable {
     let parent: ResourceContext?
     let base: ResourceBase
-    let fullPath: String?
     var resources: ResourceDict
     
     /**
@@ -53,10 +52,9 @@ public class ResourceContext : DebugPrintable {
         :param: base    The resource base for persistence.
         :param: resources   Resources to associate with the root such as the user "me".
     */
-    public init(base: ResourceBase, resources: ResourceDict? = nil) {
+    public init(base: ResourceBase, resources: ResourceDict?) {
         self.parent = nil
         self.base = base
-        self.fullPath = nil
         self.resources = resources ?? [:]
     }
         
@@ -70,7 +68,6 @@ public class ResourceContext : DebugPrintable {
     public init(parent: ResourceContext, resources: ResourceDict?) {
         self.parent = parent
         self.base = parent.base
-        self.fullPath = nil
         self.resources = resources ?? [:]
     }
     
