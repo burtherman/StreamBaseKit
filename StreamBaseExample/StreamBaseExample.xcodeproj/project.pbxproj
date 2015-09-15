@@ -15,7 +15,6 @@
 		E749F5581BA798A9006143D5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = E749F5561BA798A9006143D5 /* LaunchScreen.xib */; };
 		E749F5641BA798A9006143D5 /* StreamBaseExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E749F5631BA798A9006143D5 /* StreamBaseExampleTests.swift */; };
 		E749F5701BA79AD0006143D5 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = E749F56F1BA79AD0006143D5 /* Environment.swift */; };
-		E749F5721BA79EA8006143D5 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = E749F5711BA79EA8006143D5 /* Message.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,7 +42,6 @@
 		E749F5621BA798A9006143D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E749F5631BA798A9006143D5 /* StreamBaseExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamBaseExampleTests.swift; sourceTree = "<group>"; };
 		E749F56F1BA79AD0006143D5 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
-		E749F5711BA79EA8006143D5 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,7 +108,6 @@
 				E749F5541BA798A9006143D5 /* Images.xcassets */,
 				E749F5561BA798A9006143D5 /* LaunchScreen.xib */,
 				E749F5511BA798A9006143D5 /* Main.storyboard */,
-				E749F5711BA79EA8006143D5 /* Message.swift */,
 				E749F54B1BA798A9006143D5 /* Supporting Files */,
 				E749F54F1BA798A9006143D5 /* ViewController.swift */,
 			);
@@ -294,7 +291,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E749F5501BA798A9006143D5 /* ViewController.swift in Sources */,
-				E749F5721BA79EA8006143D5 /* Message.swift in Sources */,
 				E749F5701BA79AD0006143D5 /* Environment.swift in Sources */,
 				E749F54E1BA798A9006143D5 /* AppDelegate.swift in Sources */,
 			);
