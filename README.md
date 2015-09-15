@@ -341,12 +341,13 @@ ResourceBase has a number of hooks for subclasses to use when extending it.  The
 A simple example project is included.  To build it:
 
 ```
-$ cd StreamBaseExample
+$ git clone https://github.com/movem3nt/StreamBaseKit.git
+$ cd StreamBaseKit/StreamBaseExample
 $ pod install
 $ open StreamBaseExample.xcworkspace
 ```
 
-and then hit command-R.
+Set the active scheme to StreamBaseExample, and then hit command-R.
 
 # Comparison with FirebaseUI-iOS
 
