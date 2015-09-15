@@ -302,17 +302,17 @@ group.name = "group name"
 rootResourceContext.create(group)
 ```
 
-Recall that "$group" in "/group_message/$group/@" indicates a context key which must be filled in in order to persist a group message.  The ResourceContext is responsible for doing this.  Say you had a GroupViewController which allows users to message groups.  In your initial view controller, before pushing the group view controller onto your navigation controller, you'd do something like this:
+Recall that "$group" in "/group_message/$group/@" indicates a context key which must be filled in in order to persist a GroupMessage.  The ResourceContext is responsible for doing this.  Say you had a GroupViewController which allows users to message groups.  In your initial view controller, before pushing the group view controller onto your navigation controller, you'd do something like this:
 
 ```swift
 override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     switch(segue.destinationViewController) {
-    case let groupVC as GroupTableViewController:
+    case let groupVC as GroupViewController:
         groupVC.resourceContext = resourceContext.push(["group": sender as! Group])
 	// ...
 ```
 
-Now, when you call ```resourceContext.create(GroupMessage())``` in GroupViewController it will know how to resolve the key "$group".  Similarly, if you went deeper and could like messages in groups, you could do that by pushing yet another ResourceContext onto the stack transiently.  That might look like:
+Now, when you call ```resourceContext.create(GroupMessage())``` in GroupViewController it will know how to resolve the key "$group".  Similarly, if you went deeper and could "like" messages in groups, you could do that by pushing yet another ResourceContext onto the stack transiently.  That might look like:
 
 ```swift
 func messageLikeTouched(sender: MessageLikeControl) {
