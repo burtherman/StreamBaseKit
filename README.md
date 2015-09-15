@@ -302,7 +302,7 @@ group.name = "group name"
 rootResourceContext.create(group)
 ```
 
-Recall that the "$" indicates a context key which must be filled in in order to persist the object.  The ResourceContext is responsible for doing this.  Say you had a GroupViewController which allows users to message groups.  In your initial view controller, before pushing the group view controller onto your navigation controller, you'd do something like this:
+Recall that "$group" in "/group_message/$group/@" indicates a context key which must be filled in in order to persist a group message.  The ResourceContext is responsible for doing this.  Say you had a GroupViewController which allows users to message groups.  In your initial view controller, before pushing the group view controller onto your navigation controller, you'd do something like this:
 
 ```swift
 override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
