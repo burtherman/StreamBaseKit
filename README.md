@@ -332,7 +332,7 @@ registry.counter(Group.self, "message_count", GroupMessage.self)
 
 The ResourceBase will take care of incrementing and decrementing the "message_count" when messages are created and destroyed.  Since groups are registered under "/group/@", this counter will appear here: "/group/$group_key/message_count".  
 
-Note that this counter is maintained client-side, and so can become inconsistent over time.  For example, it doesn't work when offline due to a Firebase limitation with transactions.
+Note that this counter is maintained client-side, and so can become inconsistent over time.  For example, Firebase [transactions are not persisted across app restarts](https://www.firebase.com/docs/ios/guide/offline-capabilities.html), so if the user makes changes while offline, and then closes the app, counters may not be updated.
 
 ## Extending ResourceBase
 
