@@ -21,6 +21,8 @@ class ViewController: SLKTextViewController {
         
         inverted = true
         
+        tableView.separatorStyle = .None
+        
         resourceContext = ResourceContext(base: Environment.sharedEnv.resourceBase, resources: nil)
         let ref = resourceContext.collectionRef(Message.self)
         stream = StreamBase(type: Message.self, ref: ref, limit: nil, ascending: !inverted)
