@@ -22,7 +22,8 @@ class ViewController: SLKTextViewController {
         inverted = true
         
         resourceContext = ResourceContext(base: Environment.sharedEnv.resourceBase, resources: nil)
-        stream = StreamBase(type: Message.self, ref: resourceContext.collectionRef(Message.self), limit: nil, ascending: false)
+        let ref = resourceContext.collectionRef(Message.self)
+        stream = StreamBase(type: Message.self, ref: ref, limit: nil, ascending: false)
         adapter = StreamTableViewAdapter(tableView: tableView)
         stream.delegate = adapter
     }
@@ -31,8 +32,8 @@ class ViewController: SLKTextViewController {
         let message = Message()
         message.username = UIDevice.currentDevice().name
         message.text = textView.text
-        textView.text = nil
         resourceContext.create(message)
+        textView.text = nil
     }
 }
 
