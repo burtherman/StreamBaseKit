@@ -3,7 +3,7 @@
 //  StreamBaseExample
 //
 //  Created by Steve Farrell on 9/14/15.
-//  Copyright (c) 2015 Steve Farrell. All rights reserved.
+//  Copyright (c) 2015 Movem3nt. All rights reserved.
 //
 
 import Foundation

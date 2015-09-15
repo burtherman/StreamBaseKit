@@ -3,7 +3,7 @@
 //  StreamBaseExample
 //
 //  Created by Steve Farrell on 9/14/15.
-//  Copyright (c) 2015 Steve Farrell. All rights reserved.
+//  Copyright (c) 2015 Movem3nt. All rights reserved.
 //
 
 import Foundation
@@ -16,12 +16,11 @@ class Environment {
     static let sharedEnv: Environment = {
         let firebase = Firebase(url: "https://streambase-example.firebaseio.com")
         let resourceBase = ResourceBase(firebase: firebase)
-        let env = Environment(resourceBase: resourceBase)
         let registry: ResourceRegistry = resourceBase
         
         registry.resource(Message.self, path: "/message/@")
         
-        return env
+        return Environment(resourceBase: resourceBase)
     }()
     
     init(resourceBase: ResourceBase) {
