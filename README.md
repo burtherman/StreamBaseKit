@@ -336,6 +336,17 @@ Note that this counter is maintained client-side, and so can become inconsistent
 
 ResourceBase has a number of hooks for subclasses to use when extending it.  There are hooks for create, update and destroy that are invoked before, after commit to local storage, and after commit to remote storage.  There is also a hook for [logging so a server can handle side effects](https://medium.com/@spf2/action-logs-for-firebase-30a699200660).
 
+# Building the Example
+
+A simple example project is included.  To build it:
+
+```
+$ cd StreamBaseExample
+$ pod install
+$ open StreamBaseExample.xcworkspace
+```
+
+and then hit command-R.
 
 # Comparison with FirebaseUI-iOS
 
