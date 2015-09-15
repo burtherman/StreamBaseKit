@@ -23,7 +23,7 @@ class ViewController: SLKTextViewController {
         
         resourceContext = ResourceContext(base: Environment.sharedEnv.resourceBase, resources: nil)
         let ref = resourceContext.collectionRef(Message.self)
-        stream = StreamBase(type: Message.self, ref: ref, limit: nil, ascending: false)
+        stream = StreamBase(type: Message.self, ref: ref, limit: nil, ascending: !inverted)
         adapter = StreamTableViewAdapter(tableView: tableView)
         stream.delegate = adapter
     }
