@@ -11,7 +11,6 @@ import SlackTextViewController
 import StreamBaseKit
 
 class ViewController: SLKTextViewController {
-    
     var resourceContext: ResourceContext!
     var stream: StreamBase!
     var adapter: StreamTableViewAdapter!
