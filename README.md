@@ -259,9 +259,11 @@ You register resources with an the ResourceBase using the ResourceRegistry proto
 Environment.swift
 
 class Environment {
+  var resourceBase: ResourceBase!
+
   static let sharedEnv: Environment = {
     let env = Environment()
-    env.firebase = Firebase(url: "https://<YOUR-FIREBASE-APP>.firebaseio.com")
+    let firebase = Firebase(url: "https://<YOUR-FIREBASE-APP>.firebaseio.com")
     env.resourceBase = ResourceBase(firebase: firebase)
 
     let registry: ResourceRegistry = env.resourceBase
@@ -306,10 +308,10 @@ Recall that "$group" in "/group_message/$group/@" indicates a context key which 
 
 ```swift
 override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-    switch(segue.destinationViewController) {
-    case let groupVC as GroupViewController:
-        groupVC.resourceContext = resourceContext.push(["group": sender as! Group])
-	// ...
+  switch(segue.destinationViewController) {
+  case let groupVC as GroupViewController:
+    groupVC.resourceContext = resourceContext.push(["group": sender as! Group])
+    // ...
 ```
 
 Now, when you call ```resourceContext.create(GroupMessage())``` in GroupViewController it will know how to resolve the key "$group".  Similarly, if you went deeper and could "like" messages in groups, you could do that by pushing yet another ResourceContext onto the stack transiently.  That might look like:
