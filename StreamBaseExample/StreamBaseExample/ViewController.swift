@@ -36,9 +36,9 @@ class ViewController: SLKTextViewController {
         resourceContext.create(message)
         textView.text = nil
     }
-}
+    
+    // MARK: UITableViewDataSource
 
-extension ViewController : UITableViewDataSource {
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return stream.count
     }

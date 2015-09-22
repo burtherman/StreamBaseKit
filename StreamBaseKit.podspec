@@ -1,12 +1,12 @@
 Pod::Spec.new do |s|
   s.name         = "StreamBaseKit"
-  s.version      = "0.1.4"
+  s.version      = "0.2.0"
   s.summary      = "."
   s.homepage     = "https://github.com/movem3nt/StreamBaseKit"
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.author       = { "Steve Farrell" => "sfarrell@gmail.com" }
   s.social_media_url = "https://twitter.com/spf2"
-  s.source       = { :git => "https://github.com/movem3nt/StreamBaseKit.git", :tag => 'v0.1.4' }
+  s.source       = { :git => "https://github.com/movem3nt/StreamBaseKit.git", :tag => 'v0.2.0' }
   s.source_files = "StreamBaseKit/**/*"
   s.dependency  "Firebase", "~> 2.3"
   s.platform = :ios
