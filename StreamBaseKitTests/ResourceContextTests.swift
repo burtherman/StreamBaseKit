@@ -21,10 +21,17 @@ class ResourceContextTests: XCTestCase {
     let c = BaseItem(key: "c")
     let d = BaseItem(key: "d")
     
+    func testNil() {
+        let rc = ResourceContext(base: base, resources: nil)
+        for (_, _) in rc {
+            XCTFail("not empty")
+        }
+    }
+    
     func testEmptyIteration() {
         let rc = ResourceContext(base: base, resources: ResourceDict())
-        for (k, v) in rc {
-            XCTFail("empty")
+        for (_, _) in rc {
+            XCTFail("not empty")
         }
     }
     

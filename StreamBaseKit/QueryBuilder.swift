@@ -69,11 +69,11 @@ public class QueryBuilder {
                 let av: AnyObject? = a.dict[key] ?? NSNull()
                 let bv: AnyObject? = b.dict[key] ?? NSNull()
                 switch (av, bv) {
-                case (let _ as NSNull, let _ as NSNull):
+                case ( _ as NSNull, _ as NSNull):
                     break
-                case (let _ as NSNull, _):
+                case (_ as NSNull, _):
                     return true
-                case (_, let _ as NSNull):
+                case (_, _ as NSNull):
                     return false
                 case (let astr as String, let bstr as String):
                     if astr != bstr {

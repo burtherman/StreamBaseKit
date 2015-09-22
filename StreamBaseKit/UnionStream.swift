@@ -64,7 +64,7 @@ public class UnionStream {
             }
         }
         
-        sort(&newUnion, comparator)
+        newUnion.sortInPlace(comparator)
         StreamBase.applyBatch(union, batch: newUnion, delegate: delegate)
         
         if numStreamsFinished == sources.count {
@@ -97,19 +97,23 @@ public class UnionStream {
     
 }
 
-extension UnionStream : SequenceType {
-    public var count: Int {
-        return union.count
+extension UnionStream : Indexable {
+    public typealias Index = Int
+    
+    public var startIndex: Index {
+        return union.startIndex
     }
     
-    public subscript(i: Int) -> BaseItem {
+    public var endIndex: Index {
+        return union.startIndex
+    }
+    
+    public subscript(i: Index) -> BaseItem {
         return union[i]
     }
-    
-    public func generate() -> GeneratorOf<BaseItem> {
-        return union.generate()
-    }
 }
+
+extension UnionStream : CollectionType { }
 
 extension UnionStream : StreamBaseProtocol {
     public func find(key: String) -> BaseItem? {

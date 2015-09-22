@@ -59,13 +59,13 @@ class TestDelegate : StreamBaseDelegate {
         didChangeCount++
     }
     func streamItemsAdded(paths: [NSIndexPath]) {
-        itemAdded.extend(paths)
+        itemAdded.appendContentsOf(paths)
     }
     func streamItemsDeleted(paths: [NSIndexPath]) {
-        itemDeleted.extend(paths)
+        itemDeleted.appendContentsOf(paths)
     }
     func streamItemsChanged(paths: [NSIndexPath]) {
-        itemChanged.extend(paths)
+        itemChanged.appendContentsOf(paths)
     }
     func streamDidFinishInitialLoad(error: NSError?) {
     }

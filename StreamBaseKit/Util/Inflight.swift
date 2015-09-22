@@ -32,6 +32,8 @@ public class Inflight {
     deinit {
         InflightManager.sharedManager.decrement()
     }
+    
+    func hold() { }
 }
 
 private class InflightManager {

@@ -56,7 +56,7 @@ public class PartitionedStream {
         self.numSections = sectionTitles.count
         self.partitioner = partitioner
         self.stream.delegate = self
-        for i in 0..<numSections {
+        for _ in 0..<numSections {
             sections.append([])
         }
     }
@@ -86,6 +86,14 @@ public class PartitionedStream {
         return sections[section]
     }
     
+    /**
+        Provide a means to iterate over the underlying stream.
+        :returns: An iterator over the underlying stream.
+    */
+    public var items: IndexingGenerator<StreamBase> {
+        return stream.generate()
+    }
+    
     private func add(section: Int, obj: BaseItem, streamIndex: Int, inout addedPaths: [NSIndexPath]) {
         if sections[section].count == 0 || stream.comparator(sections[section].last!, obj) {
             // append
@@ -111,7 +119,7 @@ public class PartitionedStream {
         if streamIndex == map.count {
             map.append(mappedPath)
         } else {
-            map.splice([mappedPath], atIndex: streamIndex)
+            map.insertContentsOf([mappedPath], at: streamIndex)
             for i in streamIndex+1..<map.count {
                 if map[i].section == mappedPath.section {
                     let moved = NSIndexPath(forRow: map[i].row + 1, inSection: map[i].section)
@@ -131,22 +139,6 @@ public class PartitionedStream {
         }
         sections[delPath.section].removeAtIndex(delPath.row)
         deletedPaths.append(delPath)
-    }
-}
-
-// MARK: SequenceType
-
-extension PartitionedStream : SequenceType {
-    public var count: Int {
-        return stream.count
-    }
-    
-    public subscript(i: Int) -> BaseItem {
-        return stream[i]
-    }
-    
-    public func generate() -> GeneratorOf<BaseItem> {
-        return stream.generate()
     }
 }
 

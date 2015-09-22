@@ -31,7 +31,7 @@ class PartitionedStreamTests: XCTestCase {
     
     func verifyMap(pstream: PartitionedStream) {
         var revMap = [NSIndexPath: Int]()
-        for (i, p) in enumerate(pstream.map) {
+        for (i, p) in pstream.map.enumerate() {
             revMap[p] = i
             XCTAssertEqual(stream[i].key!, pstream[p].key!)
         }
@@ -48,11 +48,11 @@ class PartitionedStreamTests: XCTestCase {
     
     func dumpMap(pstream: PartitionedStream) {
         var revMap = [NSIndexPath: Int]()
-        for (i, p) in enumerate(pstream.map) {
+        for (i, p) in pstream.map.enumerate() {
             if i < stream.count {
-                println("F: \(i): \(p.section)/\(p.row) -> \(stream[i].key!)")
+                print("F: \(i): \(p.section)/\(p.row) -> \(stream[i].key!)")
             } else {
-                println("F: \(i): \(p.section)/\(p.row) -> MISSING")
+                print("F: \(i): \(p.section)/\(p.row) -> MISSING")
             }
             revMap[p] = i
         }
@@ -60,9 +60,9 @@ class PartitionedStreamTests: XCTestCase {
         for s in 0..<pstream.numSections {
             for r in 0..<pstream[s].count {
                 if let i = revMap[NSIndexPath(forRow: r, inSection: s)] {
-                    println("R: \(s)/\(r): \(i) -> \(pstream[s, r].key!) == \(stream[i].key!)")
+                    print("R: \(s)/\(r): \(i) -> \(pstream[s, r].key!) == \(stream[i].key!)")
                 } else {
-                    println("R: \(s)/\(r): -> \(pstream[s, r].key!) MISSING")
+                    print("R: \(s)/\(r): -> \(pstream[s, r].key!) MISSING")
                 }
             }
         }
@@ -166,7 +166,7 @@ class PartitionedStreamTests: XCTestCase {
             default: return 3
             }
         }
-        let keys = Array("abcdefghijklmnopqrstuvwxyz9876543210ABCDEFGHIJKLMNOPQRSTUVWXYZ").map{ String($0) }
+        let keys = "abcdefghijklmnopqrstuvwxyz9876543210ABCDEFGHIJKLMNOPQRSTUVWXYZ".characters.map{ String($0) }
         for key in keys {
             let snap = FakeSnapshot(key: key)
             ref.add(snap)

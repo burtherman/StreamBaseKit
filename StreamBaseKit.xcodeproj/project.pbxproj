@@ -28,6 +28,7 @@
 		E7A021E81B98C1E400D9C3AB /* TransientStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A021E71B98C1E400D9C3AB /* TransientStream.swift */; };
 		E7A021EA1B98DBC400D9C3AB /* StreamBaseDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A021E91B98DBC400D9C3AB /* StreamBaseDelegate.swift */; };
 		E7A021EC1B98E19000D9C3AB /* StreamBaseProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A021EB1B98E19000D9C3AB /* StreamBaseProtocol.swift */; };
+		E7A3B6331BB1BBF300F5F8A7 /* String+trimPrefix.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A3B6321BB1BBF300F5F8A7 /* String+trimPrefix.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 		E7A021E71B98C1E400D9C3AB /* TransientStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransientStream.swift; sourceTree = "<group>"; };
 		E7A021E91B98DBC400D9C3AB /* StreamBaseDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamBaseDelegate.swift; sourceTree = "<group>"; };
 		E7A021EB1B98E19000D9C3AB /* StreamBaseProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamBaseProtocol.swift; sourceTree = "<group>"; };
+		E7A3B6321BB1BBF300F5F8A7 /* String+trimPrefix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+trimPrefix.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -162,6 +164,7 @@
 			children = (
 				E78988D61B9563D20049A942 /* Inflight.swift */,
 				E78988D81B9563D20049A942 /* NSTimer+Closure.swift */,
+				E7A3B6321BB1BBF300F5F8A7 /* String+trimPrefix.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -232,7 +235,8 @@
 		E78988B11B95634C0049A942 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0640;
+				LastSwiftUpdateCheck = 0710;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Steve Farrell";
 				TargetAttributes = {
 					E78988B91B95634C0049A942 = {
@@ -316,6 +320,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7A3B6331BB1BBF300F5F8A7 /* String+trimPrefix.swift in Sources */,
 				E78988DD1B9563D20049A942 /* NSTimer+Closure.swift in Sources */,
 				E78988DC1B9563D20049A942 /* KeyedArray.swift in Sources */,
 				E7A021E81B98C1E400D9C3AB /* TransientStream.swift in Sources */,
@@ -378,6 +383,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -457,6 +463,7 @@
 				INFOPLIST_FILE = StreamBaseKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.proj89.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -475,6 +482,7 @@
 				INFOPLIST_FILE = StreamBaseKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.proj89.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -494,6 +502,7 @@
 				);
 				INFOPLIST_FILE = StreamBaseKitTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.proj89.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -508,6 +517,7 @@
 				);
 				INFOPLIST_FILE = StreamBaseKitTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.proj89.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

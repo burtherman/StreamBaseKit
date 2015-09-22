@@ -70,7 +70,7 @@ public class BaseItem: Equatable, BaseItemProtocol {
         Produce a shallow copy of this object.
     */
     public func clone() -> BaseItemProtocol {
-        let copy = self.dynamicType(key: key)
+        let copy = self.dynamicType.init(key: key)
         copy.update(dict)
         return copy
     }

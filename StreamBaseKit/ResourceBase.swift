@@ -100,8 +100,8 @@ public protocol ResourceRegistry {
     protocol to register paths, and the far more convient ResourceContext to invoke 
     create/update/destroy.  The public methods in this class generally are so for subclasses.
 */
-public class ResourceBase : Printable {
-    struct ResourceSpec : Printable {
+public class ResourceBase : CustomDebugStringConvertible {
+    struct ResourceSpec : CustomDebugStringConvertible {
         let type: BaseItemProtocol.Type
         let path: String
 
@@ -110,12 +110,12 @@ public class ResourceBase : Printable {
             self.path = path
         }
 
-        var description: String {
+        var debugDescription: String {
             return "\(path) \(type)"
         }
     }
     
-    struct CounterSpec : Printable, Equatable {
+    struct CounterSpec : CustomDebugStringConvertible, Equatable {
         let type: BaseItemProtocol.Type
         let countingType: BaseItemProtocol.Type
         let path: String
@@ -128,7 +128,7 @@ public class ResourceBase : Printable {
             self.predicate = predicate
         }
         
-        var description: String {
+        var debugDescription: String {
             return "\(path) \(type) counting: \(countingType)"
         }
     }
@@ -164,7 +164,7 @@ public class ResourceBase : Printable {
     }
     
     /// Provide a description including basic stats.
-    public var description: String {
+    public var debugDescription: String {
         return "ResourceBase with \(resources.count) resources and \(counters.count) counters"
     }
 
@@ -312,10 +312,8 @@ public class ResourceBase : Printable {
     */
     public class func splitPath(path: String) -> [String] {
         var p = path
-        while p.hasPrefix("/") {
-            p = dropFirst(p)
-        }
-        return p.pathComponents
+        p.trimPrefix("/")
+        return p.componentsSeparatedByString("/")
     }
     
     func buildRef(path: String, key: String?, context: ResourceContext) -> Firebase {
@@ -328,7 +326,7 @@ public class ResourceBase : Printable {
                     ref = ref.childByAutoId()
                 }
             } else if part.hasPrefix("$") {
-                let name = dropFirst(part)
+                let name = part.prefixTrimmed("$")
                 if let obj = context.get(name) {
                     ref = ref.childByAppendingPath(obj.key!)
                 } else {
@@ -342,9 +340,9 @@ public class ResourceBase : Printable {
     }
     
     private func log(ref: Firebase, old: FDataSnapshot?, new: BaseItemProtocol?, context: ResourceContext, path: String) {
-        var path = ResourceBase.refToPath(ref)
+        let path = ResourceBase.refToPath(ref)
         var extra = ResourceDict()
-        let skip = Set(ResourceBase.splitPath(path).filter{ $0.hasPrefix("$") }.map{ dropFirst($0) })
+        let skip = Set(ResourceBase.splitPath(path).filter{ $0.hasPrefix("$") }.map{ $0.prefixTrimmed("$") })
         for (k, v) in context {
             if !skip.contains(k) {
                 extra[k] = v
@@ -387,7 +385,7 @@ public class ResourceBase : Printable {
     }
     
     func findCounterInstance(type: BaseItemProtocol.Type, context: ResourceContext) -> BaseItemProtocol? {
-        for (k, v) in context {
+        for (_, v) in context {
             if v.dynamicType.self === type.self {
                 return v
             }
@@ -433,14 +431,14 @@ public class ResourceBase : Printable {
     public func create(instance: BaseItemProtocol, context: ResourceContext) {
         let path = findResourcePath(instance.dynamicType, context: context)!
         let ref = buildRef(path, key: instance.key, context: context)
-        var inflight: Inflight? = Inflight()
+        let inflight = Inflight()
         willCreateInstance(instance, key: ref.key, context: context) { (error) in
             if let err = error {
                 self.errorHandler?(error: err)
             } else {
                 instance.key = ref.key
                 ref.setValue(instance.dict) { (error, ref) in
-                    inflight = nil
+                    inflight.hold()
                     if let err = error {
                         self.errorHandler?(error: err)
                     }
@@ -465,14 +463,14 @@ public class ResourceBase : Printable {
     public func update(instance: BaseItemProtocol, context: ResourceContext) {
         let path = findResourcePath(instance.dynamicType, context: context)!
         let ref = buildRef(path, key: instance.key, context: context)
-        var inflight: Inflight? = Inflight()
+        let inflight = Inflight()
         willUpdateInstance(instance, context: context) { (error) in
             if let err = error {
                 self.errorHandler?(error: err)
             } else {
                 ref.observeSingleEventOfType(.Value, withBlock: { snapshot in
                     ref.updateChildValues(instance.dict) { (error, ref) in
-                        inflight = nil
+                        inflight.hold()
                         if let err = error {
                             self.errorHandler?(error: err)
                         }
@@ -512,14 +510,14 @@ public class ResourceBase : Printable {
     public func destroy(instance: BaseItemProtocol, context: ResourceContext) {
         let path = findResourcePath(instance.dynamicType, context: context)!
         let ref = buildRef(path, key: instance.key, context: context)
-        var inflight: Inflight? = Inflight()
+        let inflight = Inflight()
         willDestroyInstance(instance, context: context) { (error) in
             if let err = error {
                 self.errorHandler?(error: err)
             } else {
                 ref.observeSingleEventOfType(.Value, withBlock: { snapshot in
                     ref.removeValueWithCompletionBlock { (error, ref) in
-                        inflight = nil
+                        inflight.hold()
                         if let err = error {
                             self.errorHandler?(error: err)
                         }
@@ -551,7 +549,7 @@ extension ResourceBase : ResourceRegistry {
     }
     
     public func counter(type: BaseItemProtocol.Type, name: String, countingType: BaseItemProtocol.Type, predicate: CounterPredicate?) {
-        let path = "/".join([findResourcePath(type, context: nil)!, name])
+        let path = [findResourcePath(type, context: nil)!, name].joinWithSeparator("/")
         counters.append(CounterSpec(type: type, countingType: countingType, path: path, predicate: predicate))
     }
 }

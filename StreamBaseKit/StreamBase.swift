@@ -140,7 +140,7 @@ public class StreamBase : StreamBaseProtocol {
         
         handles.append(query.observeEventType(.ChildAdded, withBlock: { [weak self] snapshot in
             if let s = self {
-                var item = s.type(key: snapshot.key)
+                let item = s.type.init(key: snapshot.key)
                 item.update(snapshot.value as? [String: AnyObject])
                 s.didConstructItem(item)
                 s.arrayBeforePredicate.append(item)
@@ -173,10 +173,10 @@ public class StreamBase : StreamBaseProtocol {
             }
             }))
         
-        var inflight: Inflight? = Inflight()
+        let inflight = Inflight()
         query.observeSingleEventOfType(.Value, withBlock: { [weak self] snapshot in
             if let s = self {
-                inflight = nil
+                inflight.hold()
                 s.shouldTellDelegateInitialLoadIsDone = true
                 s.scheduleBatch()
             }
@@ -311,15 +311,14 @@ public class StreamBase : StreamBaseProtocol {
         }
         isFetchingMore = true
         let fetchMoreQuery = queryPager(start: start, end: end, limit: count + 1)
-        let inflight = Inflight()
         fetchMoreQuery.observeSingleEventOfType(.Value, withBlock: { snapshot in
-            let i = inflight
+            let inflight = Inflight()
             self.isFetchingMore = false
             self.batching { a in
                 if let result = snapshot.value as? [String: [String: AnyObject]] {
                     for (key, dict) in result {
                         if self.arrayBeforePredicate.find(key) == nil {
-                            var item = self.type(key: key)
+                            let item = self.type.init(key: key)
                             item.update(dict)
                             self.didConstructItem(item)
                             self.arrayBeforePredicate.append(item)
@@ -328,6 +327,7 @@ public class StreamBase : StreamBaseProtocol {
                             }
                         }
                     }
+                    inflight.hold()
                 }
             }
             done?()
@@ -409,7 +409,7 @@ public class StreamBase : StreamBaseProtocol {
             timer?.invalidate()
             isBatching = false
             
-            let sortedBatch = sorted(batchArray.rawArray, comparator)
+            let sortedBatch = batchArray.rawArray.sort(comparator)
             StreamBase.applyBatch(array, batch: sortedBatch, delegate: delegate, limit: afterPredicateLimit)
             
             if shouldTellDelegateInitialLoadIsDone == true {
@@ -462,14 +462,14 @@ public class StreamBase : StreamBaseProtocol {
     private class func diffFrom(from: [BaseItem], to: [BaseItem]) -> ([Int], [Int]) {
         var deletes = [Int]()
         var adds = [Int]()
-        var fromKeys = Set(from.map{ $0.key! })
+        let fromKeys = Set(from.map{ $0.key! })
         let toKeys = Set(to.map{ $0.key! })
-        for (i, item) in enumerate(from) {
+        for (i, item) in from.enumerate() {
             if !toKeys.contains(item.key!) {
                 deletes.append(i)
             }
         }
-        for (i, item) in enumerate(to) {
+        for (i, item) in to.enumerate() {
             if !fromKeys.contains(item.key!) {
                 adds.append(i)
             }
@@ -484,16 +484,20 @@ public class StreamBase : StreamBaseProtocol {
 
 // MARK: SequenceType
 
-extension StreamBase : SequenceType {
-    public var count: Int {
-        return array.count
-    }
+extension StreamBase : Indexable {
+    public typealias Index = Int
     
-    public subscript(i: Int) -> BaseItem {
+    public subscript(i: Index) -> BaseItem {
         return array[i]
     }
     
-    public func generate() -> GeneratorOf<BaseItem> {
-        return array.generate()
+    public var startIndex: Index {
+        return array.startIndex
+    }
+    
+    public var endIndex: Index {
+        return array.endIndex
     }
 }
+
+extension StreamBase : CollectionType { }

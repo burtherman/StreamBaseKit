@@ -146,27 +146,20 @@ public class KeyedArray<T: KeyedObject> {
     }
 }
 
-extension KeyedArray : CollectionType {
-    public var count: Int {
-        return rawArray.count
-    }
+extension KeyedArray : Indexable {
+    public typealias Index = Int
     
-    public subscript(i: Int) -> T {
+    public subscript(i: Index) -> T {
         return rawArray[i]
     }
     
-    public func generate() -> GeneratorOf<T> {
-        var g = rawArray.generate()
-        return GeneratorOf<T> {
-            return g.next()
-        }
-    }
-    
-    public var startIndex: Int {
+    public var startIndex: Index {
         return rawArray.startIndex
     }
     
-    public var endIndex: Int {
+    public var endIndex: Index {
         return rawArray.endIndex
-    }
+    }    
 }
+
+extension KeyedArray : CollectionType { }

@@ -41,7 +41,7 @@ import Firebase
     If the same key appears at different levels of the stack, the value for the higher level
     key will be used.
 */
-public class ResourceContext : DebugPrintable {
+public class ResourceContext : CustomDebugStringConvertible {
     let parent: ResourceContext?
     let base: ResourceBase
     var resources: ResourceDict
@@ -74,10 +74,10 @@ public class ResourceContext : DebugPrintable {
     /**
         Iterate through the stack from this the top (this ResourceContext).
     */
-    public var stack: GeneratorOf<ResourceContext> {
+    public var stack: AnyGenerator<ResourceContext> {
         var current: ResourceContext? = self
-        return GeneratorOf<ResourceContext> {
-            var ret = current
+        return anyGenerator {
+            let ret = current
             current = current?.parent
             return ret
         }
@@ -88,16 +88,16 @@ public class ResourceContext : DebugPrintable {
     */
     public var debugDescription: String {
         var parts = [String]()
-        for (i, c) in enumerate(reverse(Array<ResourceContext>(stack))) {
+        for (i, c) in stack.reverse().enumerate() {
             var part = i.description
-            for j in 0...i {
+            for _ in 0...i {
                 part += "  "
             }
             part += c.resources.description
             parts.append(part)
         }
         
-        return "\n".join(parts)
+        return parts.joinWithSeparator("\n")
     }
     
     /**
@@ -120,7 +120,7 @@ public class ResourceContext : DebugPrintable {
     
         :param: resources   The new resources.
     */
-    public func reset(_ resources: ResourceDict? = nil) {
+    public func reset(resources: ResourceDict? = nil) {
         self.resources = resources ?? [:]
     }
     
@@ -132,7 +132,7 @@ public class ResourceContext : DebugPrintable {
     
         :returns:   The new top of the stack.
     */
-    public func push(_ resources: ResourceDict? = nil) -> ResourceContext {
+    public func push(resources: ResourceDict? = nil) -> ResourceContext {
         return ResourceContext(parent: self, resources: resources)
     }
     
@@ -216,22 +216,21 @@ public class ResourceContext : DebugPrintable {
 }
 
 extension ResourceContext : SequenceType {
-    public func generate() -> GeneratorOf<(String, BaseItemProtocol)> {
-        var stack = self.stack
+    public func generate() -> AnyGenerator<(String, BaseItemProtocol)> {
+        let stack = self.stack
         var current = stack.next()
-        var index = 0
+        var keys = current!.resources.keys
         var seen = Set<String>()
-        return GeneratorOf<(String, BaseItemProtocol)> {
+        return anyGenerator {
             while current != nil {
-                for ; index < current!.resources.keys.array.count; index++ {
-                    var name = current!.resources.keys.array[index]
-                    if !seen.contains(name) {
-                        seen.insert(name)
-                        return (name, current!.resources[name]!)
-                    }
+                for key in keys where !seen.contains(key) {
+                    seen.insert(key)
+                    return (key, current!.resources[key]!)
                 }
-                index = 0
                 current = stack.next()
+                if let cur = current {
+                    keys = cur.resources.keys
+                }
             }
             return nil
         }
